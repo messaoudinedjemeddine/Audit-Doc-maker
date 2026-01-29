@@ -33,6 +33,8 @@ export default function Home() {
       })),
       logoDataUrl: first.logoDataUrl,
       headerColor: first.headerColor,
+      sectionHeaderColor: first.sectionHeaderColor,
+      questionRowColor: first.questionRowColor,
       tableColumns: { ...first.tableColumns },
       rows: [
         {
@@ -72,7 +74,7 @@ export default function Home() {
       {/* Toolbar - hidden when printing */}
       <div className="no-print fixed right-6 top-6 z-50 flex flex-wrap items-center gap-3">
         <label className="flex items-center gap-2 text-sm text-slate-700">
-          <span>Header color:</span>
+          <span>Header:</span>
           <input
             type="color"
             value={pages[0]?.headerColor ?? '#0284c7'}
@@ -82,6 +84,32 @@ export default function Home() {
             }}
             className="h-9 w-14 cursor-pointer rounded border border-slate-300"
             title="Table header color"
+          />
+        </label>
+        <label className="flex items-center gap-2 text-sm text-slate-700">
+          <span>Section titles:</span>
+          <input
+            type="color"
+            value={pages[0]?.sectionHeaderColor ?? '#e2e8f0'}
+            onChange={(e) => {
+              const color = e.target.value
+              setPages((prev) => prev.map((p) => ({ ...p, sectionHeaderColor: color })))
+            }}
+            className="h-9 w-14 cursor-pointer rounded border border-slate-300"
+            title="Section title rows color"
+          />
+        </label>
+        <label className="flex items-center gap-2 text-sm text-slate-700">
+          <span>Item rows:</span>
+          <input
+            type="color"
+            value={pages[0]?.questionRowColor ?? '#f8fafc'}
+            onChange={(e) => {
+              const color = e.target.value
+              setPages((prev) => prev.map((p) => ({ ...p, questionRowColor: color })))
+            }}
+            className="h-9 w-14 cursor-pointer rounded border border-slate-300"
+            title="Question row (title item) color"
           />
         </label>
         <button

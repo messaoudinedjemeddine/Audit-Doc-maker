@@ -47,8 +47,10 @@ function DottedLines({ lines = 3 }: { lines?: number }) {
 }
 
 export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
-  const { rows, tableColumns, headerColor } = data
+  const { rows, tableColumns, headerColor, sectionHeaderColor, questionRowColor } = data
   const headerStyle = { backgroundColor: headerColor, borderColor: headerColor }
+  const sectionStyle = { backgroundColor: sectionHeaderColor }
+  const questionRowStyle = { backgroundColor: questionRowColor }
 
   const setRows = (newRows: TableRow[]) => onChange({ rows: newRows })
 
@@ -74,12 +76,26 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
     setRows(updateRow(rows, id, { title }) as TableRow[])
   }
 
+  const toggleYes = (id: string) => {
+    const row = rows.find((r) => r.id === id && r.type === 'question')
+    if (row && row.type === 'question') {
+      updateQuestion(id, { yes: !row.yes, no: false })
+    }
+  }
+
+  const toggleNo = (id: string) => {
+    const row = rows.find((r) => r.id === id && r.type === 'question')
+    if (row && row.type === 'question') {
+      updateQuestion(id, { no: !row.no, yes: false })
+    }
+  }
+
   return (
     <div className="overflow-hidden border border-slate-500 bg-white shadow-sm">
       <table className="w-full table-fixed border-collapse">
         <thead>
           <tr style={headerStyle}>
-            <th className="w-[48%] border px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide text-white" style={headerStyle}>
+            <th className="w-[49%] border px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide text-white" style={headerStyle}>
               {readOnly ? (
                 tableColumns.exigences
               ) : (
@@ -95,7 +111,7 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                 />
               )}
             </th>
-            <th className="w-[10%] border px-2 py-3 text-center text-xs font-semibold uppercase tracking-wide text-white" style={headerStyle}>
+            <th className="w-[9%] border px-2 py-3 text-center text-xs font-semibold uppercase tracking-wide text-white" style={headerStyle}>
               {readOnly ? (
                 tableColumns.yes
               ) : (
@@ -111,7 +127,7 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                 />
               )}
             </th>
-            <th className="w-[8%] border px-2 py-3 text-center text-xs font-semibold uppercase tracking-wide text-white" style={headerStyle}>
+            <th className="w-[9%] border px-2 py-3 text-center text-xs font-semibold uppercase tracking-wide text-white" style={headerStyle}>
               {readOnly ? (
                 tableColumns.no
               ) : (
@@ -127,7 +143,7 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                 />
               )}
             </th>
-            <th className="w-[34%] border px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide text-white" style={headerStyle}>
+            <th className="w-[33%] border px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide text-white" style={headerStyle}>
               {readOnly ? (
                 tableColumns.observation
               ) : (
@@ -148,10 +164,11 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
         <tbody>
           {rows.map((row) =>
             row.type === 'section' ? (
-              <tr key={row.id} className="group border-b border-slate-500 bg-slate-50">
+              <tr key={row.id} className="group border-b border-slate-500">
                 <td
                   colSpan={4}
                   className="border-r border-b border-slate-500 px-3 py-3"
+                  style={sectionStyle}
                 >
                   <div className="flex items-center justify-between gap-2">
                     {readOnly ? (
@@ -193,7 +210,7 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                 key={row.id}
                 className="group border-b border-slate-500 transition hover:bg-slate-50/50"
               >
-                <td className="border border-slate-500 px-3 py-2 align-top">
+                <td className="border border-slate-500 px-3 py-2 align-top" style={questionRowStyle}>
                   <div className="space-y-1">
                     {readOnly ? (
                       <>
@@ -222,18 +239,48 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                     )}
                   </div>
                 </td>
-                <td className="w-[10%] border border-slate-500 bg-white text-center align-middle">
-                  <div className="flex justify-center py-1" aria-hidden>
-                    <div className="h-6 w-6 shrink-0 border-2 border-slate-500 bg-white" />
-                  </div>
+                <td className="w-[9%] border border-slate-500 bg-white text-center align-middle">
+                  <button
+                    type="button"
+                    onClick={() => toggleYes(row.id)}
+                    disabled={readOnly}
+                    className="flex w-full items-center justify-center py-1 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-sky-300 disabled:pointer-events-none"
+                    title="Yes"
+                  >
+                    <div className="flex h-6 w-6 shrink-0 items-center justify-center border-2 border-slate-500 bg-white text-lg font-bold">
+                      {row.yes ? <span className="text-green-600">✔</span> : null}
+                    </div>
+                  </button>
                 </td>
-                <td className="w-[8%] border border-slate-500 bg-white text-center align-middle">
-                  <div className="flex justify-center py-1" aria-hidden>
-                    <div className="h-6 w-6 shrink-0 border-2 border-slate-500 bg-white" />
-                  </div>
+                <td className="w-[9%] border border-slate-500 bg-white text-center align-middle">
+                  <button
+                    type="button"
+                    onClick={() => toggleNo(row.id)}
+                    disabled={readOnly}
+                    className="flex w-full items-center justify-center py-1 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-sky-300 disabled:pointer-events-none"
+                    title="No"
+                  >
+                    <div className="flex h-6 w-6 shrink-0 items-center justify-center border-2 border-slate-500 bg-white text-lg font-bold">
+                      {row.no ? <span className="text-red-600">✗</span> : null}
+                    </div>
+                  </button>
                 </td>
-                <td className="relative w-[34%] border border-slate-500 align-top px-2">
-                  <DottedLines lines={3} />
+                <td className="relative w-[33%] border border-slate-500 align-top px-2" style={questionRowStyle}>
+                  {readOnly ? (
+                    row.observation ? (
+                      <div className="min-h-[2rem] whitespace-pre-wrap py-1 text-sm text-slate-700">{row.observation}</div>
+                    ) : (
+                      <DottedLines lines={3} />
+                    )
+                  ) : (
+                    <textarea
+                      value={row.observation}
+                      onChange={(e) => updateQuestion(row.id, { observation: e.target.value })}
+                      placeholder="Enter observations..."
+                      rows={3}
+                      className="min-h-[2rem] w-full resize-y border-0 bg-transparent py-1 text-sm text-slate-700 placeholder:text-slate-400 focus:ring-2 focus:ring-sky-300 focus:ring-inset"
+                    />
+                  )}
                   {!readOnly && (
                     <div className="no-print absolute right-1 top-1 flex gap-1 opacity-0 transition group-hover:opacity-100">
                       <button

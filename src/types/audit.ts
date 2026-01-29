@@ -24,6 +24,8 @@ export interface AuditPageData {
   docMeta: DocMetaItem[];
   logoDataUrl: string | null;
   headerColor: string;
+  sectionHeaderColor: string;
+  questionRowColor: string;
   tableColumns: { exigences: string; yes: string; no: string; observation: string };
   rows: TableRow[];
 }
@@ -59,6 +61,8 @@ export const defaultPageData = (id: string): AuditPageData => ({
   docMeta: defaultDocMeta(),
   logoDataUrl: null,
   headerColor: '#0284c7',
+  sectionHeaderColor: '#e2e8f0',
+  questionRowColor: '#f8fafc',
   tableColumns: {
     exigences: 'Exigences',
     yes: 'Yes',
