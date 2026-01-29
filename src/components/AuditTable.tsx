@@ -13,7 +13,9 @@ interface AuditTableProps {
 }
 
 function updateRow(rows: TableRow[], id: string, updates: Partial<TableRow>): TableRow[] {
-  return rows.map((r) => (r.id === id ? { ...r, ...updates } : r))
+  return rows.map((r) =>
+    r.id === id ? ({ ...r, ...updates } as TableRow) : r
+  )
 }
 
 function removeRow(rows: TableRow[], id: string): TableRow[] {
