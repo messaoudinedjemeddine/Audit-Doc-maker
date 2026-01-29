@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground: #0f172a;
+  --background: #f8fafc;
+}
+
+@media print {
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+/* Hide toolbar and all edit controls when printing */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  /* Make inputs look like static text (no borders/background) */
+  input,
+  select,
+  textarea {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  /* Buttons in document: hide or make look like static content */
+  button {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+}
