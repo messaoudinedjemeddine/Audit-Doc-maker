@@ -161,9 +161,9 @@ export function DocumentHeader({
         </div>
 
         {/* Doc credentials: editable labels + values, reorderable */}
-        <div className="mt-1 space-y-0.5 text-sm text-slate-600">
+        <div className="mt-1 space-y-0 text-sm text-slate-600">
           {docMeta.map((item, index) => (
-            <div key={item.id} className="flex items-center justify-end gap-2">
+            <div key={item.id} className="flex items-center justify-end gap-2 border-b border-slate-400 py-1.5 last:border-b-0">
               {!readOnly && (
                 <div className="no-print flex shrink-0 items-center gap-0.5" aria-hidden>
                   <button

@@ -75,7 +75,7 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div className="overflow-hidden border border-slate-500 bg-white shadow-sm">
       <table className="w-full table-fixed border-collapse">
         <thead>
           <tr style={headerStyle}>
@@ -91,7 +91,7 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                       tableColumns: { ...tableColumns, exigences: e.target.value },
                     })
                   }
-                  className="w-full rounded border-0 bg-transparent text-white placeholder:text-white/70 focus:ring-2 focus:ring-white focus:ring-inset"
+                  className="w-full border-0 bg-transparent text-white placeholder:text-white/70 focus:ring-2 focus:ring-white focus:ring-inset"
                 />
               )}
             </th>
@@ -107,7 +107,7 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                       tableColumns: { ...tableColumns, yes: e.target.value },
                     })
                   }
-                  className="w-full rounded border-0 bg-transparent text-center text-white placeholder:text-white/70 focus:ring-2 focus:ring-white focus:ring-inset"
+                  className="w-full border-0 bg-transparent text-center text-white placeholder:text-white/70 focus:ring-2 focus:ring-white focus:ring-inset"
                 />
               )}
             </th>
@@ -123,7 +123,7 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                       tableColumns: { ...tableColumns, no: e.target.value },
                     })
                   }
-                  className="w-full rounded border-0 bg-transparent text-center text-white placeholder:text-white/70 focus:ring-2 focus:ring-white focus:ring-inset"
+                  className="w-full border-0 bg-transparent text-center text-white placeholder:text-white/70 focus:ring-2 focus:ring-white focus:ring-inset"
                 />
               )}
             </th>
@@ -139,7 +139,7 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                       tableColumns: { ...tableColumns, observation: e.target.value },
                     })
                   }
-                  className="w-full rounded border-0 bg-transparent text-white placeholder:text-white/70 focus:ring-2 focus:ring-white focus:ring-inset"
+                  className="w-full border-0 bg-transparent text-white placeholder:text-white/70 focus:ring-2 focus:ring-white focus:ring-inset"
                 />
               )}
             </th>
@@ -148,10 +148,10 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
         <tbody>
           {rows.map((row) =>
             row.type === 'section' ? (
-              <tr key={row.id} className="group border-b border-slate-200 bg-slate-50">
+              <tr key={row.id} className="group border-b border-slate-500 bg-slate-50">
                 <td
                   colSpan={4}
-                  className="border-r border-b border-slate-200 px-3 py-3"
+                  className="border-r border-b border-slate-500 px-3 py-3"
                 >
                   <div className="flex items-center justify-between gap-2">
                     {readOnly ? (
@@ -161,7 +161,7 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                         type="text"
                         value={row.title}
                         onChange={(e) => updateSection(row.id, e.target.value)}
-                        className="min-w-0 flex-1 rounded border-0 bg-transparent font-bold text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-sky-300 focus:ring-inset"
+                        className="min-w-0 flex-1 border-0 bg-transparent font-bold text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-sky-300 focus:ring-inset"
                         placeholder="Section title"
                       />
                     )}
@@ -191,9 +191,9 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
             ) : (
               <tr
                 key={row.id}
-                className="group border-b border-slate-200 transition hover:bg-slate-50/50"
+                className="group border-b border-slate-500 transition hover:bg-slate-50/50"
               >
-                <td className="border border-slate-200 px-3 py-2 align-top">
+                <td className="border border-slate-500 px-3 py-2 align-top">
                   <div className="space-y-1">
                     {readOnly ? (
                       <>
@@ -206,33 +206,33 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                           type="text"
                           value={row.title}
                           onChange={(e) => updateQuestion(row.id, { title: e.target.value })}
-                          className="w-full rounded border-0 bg-transparent text-sm font-semibold text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-sky-300 focus:ring-inset"
+                          className="w-full border-0 bg-transparent text-sm font-semibold text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-sky-300 focus:ring-inset"
                           placeholder="Item title"
                         />
-                        <input
-                          type="text"
+                        <textarea
                           value={row.description}
                           onChange={(e) =>
                             updateQuestion(row.id, { description: e.target.value })
                           }
-                          className="w-full rounded border-0 bg-transparent text-xs text-slate-600 placeholder:text-slate-400 focus:ring-2 focus:ring-sky-300 focus:ring-inset"
-                          placeholder="Description"
+                          rows={3}
+                          className="mt-1 w-full min-h-[4rem] resize-y border-0 bg-transparent text-xs text-slate-600 placeholder:text-slate-400 focus:ring-2 focus:ring-sky-300 focus:ring-inset"
+                          placeholder="Description (paragraph)"
                         />
                       </>
                     )}
                   </div>
                 </td>
-                <td className="w-[10%] border border-slate-200 bg-white text-center align-middle">
+                <td className="w-[10%] border border-slate-500 bg-white text-center align-middle">
                   <div className="flex justify-center py-1" aria-hidden>
-                    <div className="h-6 w-6 shrink-0 rounded border-2 border-slate-400 bg-white" />
+                    <div className="h-6 w-6 shrink-0 border-2 border-slate-500 bg-white" />
                   </div>
                 </td>
-                <td className="w-[8%] border border-slate-200 bg-white text-center align-middle">
+                <td className="w-[8%] border border-slate-500 bg-white text-center align-middle">
                   <div className="flex justify-center py-1" aria-hidden>
-                    <div className="h-6 w-6 shrink-0 rounded border-2 border-slate-400 bg-white" />
+                    <div className="h-6 w-6 shrink-0 border-2 border-slate-500 bg-white" />
                   </div>
                 </td>
-                <td className="relative w-[34%] border border-slate-200 align-top px-2">
+                <td className="relative w-[34%] border border-slate-500 align-top px-2">
                   <DottedLines lines={3} />
                   {!readOnly && (
                     <div className="no-print absolute right-1 top-1 flex gap-1 opacity-0 transition group-hover:opacity-100">
@@ -262,7 +262,7 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
         {!readOnly && (
           <tfoot className="no-print">
             <tr>
-              <td colSpan={4} className="border border-dashed border-slate-300 bg-slate-50/80 px-4 py-3 text-center">
+              <td colSpan={4} className="border border-dashed border-slate-500 bg-slate-50/80 px-4 py-3 text-center">
                 <div className="flex flex-wrap justify-center gap-2">
                   <button
                     type="button"
