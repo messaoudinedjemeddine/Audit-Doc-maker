@@ -29,13 +29,15 @@ export function AuditPage({
 }: AuditPageProps) {
   return (
     <div className="mx-auto w-[210mm] min-h-[297mm] rounded-2xl border border-slate-200 bg-white p-6 shadow-card print:min-h-0 print:rounded-none print:border-0 print:shadow-none print:break-after-page">
-      <DocumentHeader
-        data={data}
-        onChange={onChange}
-        pageIndex={pageIndex}
-        totalPages={totalPages}
-        readOnly={readOnly}
-      />
+      {pageIndex === 0 && (
+        <DocumentHeader
+          data={data}
+          onChange={onChange}
+          pageIndex={pageIndex}
+          totalPages={totalPages}
+          readOnly={readOnly}
+        />
+      )}
       <AuditTable
         data={data}
         onChange={onChange}

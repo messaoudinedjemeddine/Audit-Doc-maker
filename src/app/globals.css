@@ -65,10 +65,19 @@
   }
 }
 
-/* Vertical lines between all columns - 1px black for less bold look */
+/* Table borders: 1px black for vertical (columns) and horizontal (row dividers) - same as vertical */
 table.audit-table td,
 table.audit-table th {
   border: 1px solid #000 !important;
+}
+
+/* Horizontal lines between question/section rows - 1px like vertical lines */
+table.audit-table tbody tr td {
+  border-bottom: 1px solid #000 !important;
+}
+
+table.audit-table thead th {
+  border-bottom: 1px solid #000 !important;
 }
 
 td.observation-cell {

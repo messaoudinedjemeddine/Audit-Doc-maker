@@ -261,10 +261,10 @@ export function AuditTable({ data, onChange, readOnly, onInsertPageBreakAbove, c
         <tbody>
           {rows.map((row, rowIndex) =>
             row.type === 'section' ? (
-              <tr key={row.id} className="group border-b border-black">
+              <tr key={row.id} className="group">
                 <td
                   colSpan={7}
-                  className={`border-r border-b border-black ${compact ? 'px-2 py-1.5' : 'px-3 py-3'}`}
+                  className={`border-r ${compact ? 'px-2 py-1.5' : 'px-3 py-3'}`}
                   style={sectionStyle}
                 >
                   <div className="flex items-center justify-between gap-2">
@@ -315,7 +315,7 @@ export function AuditTable({ data, onChange, readOnly, onInsertPageBreakAbove, c
             ) : (
               <tr
                 key={row.id}
-                className="group border-b border-black transition hover:bg-slate-50/50"
+                className="group transition hover:bg-slate-50/50"
               >
                 {COL_KEYS.map((key) => {
                   if (key === 'exigences') {
