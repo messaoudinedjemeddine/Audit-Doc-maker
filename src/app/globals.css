@@ -31,19 +31,27 @@
     /* Hide textarea resize handle (paragraph/extend icon) when saving/printing */
     resize: none !important;
   }
+  /* Don't show placeholder text in PDF (e.g. "Saisir les observations...") when field is empty */
+  input::placeholder,
+  textarea::placeholder {
+    color: transparent !important;
+    opacity: 0 !important;
+  }
   /* Buttons in document: hide or make look like static content */
   button {
     border: none !important;
     background: transparent !important;
     box-shadow: none !important;
   }
-  /* Keep table cell borders visible when saving/printing - black, same weight for all (including observation) */
+  /* Table cell borders: thicker in print so they're visible at normal zoom in PDF */
   table td,
   table th {
-    border: 2px solid #000 !important;
+    border: 3px solid #000 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
   td.observation-cell {
-    border: 2px solid #000 !important;
+    border: 3px solid #000 !important;
   }
 
   /* Auto page break: don't split table rows; flow to next A4 page when one is full */
@@ -69,6 +77,10 @@ td.observation-cell {
 }
 @media print {
   td.observation-cell {
-    border: 2px solid #000 !important;
+    border: 3px solid #000 !important;
+  }
+  table.audit-table td,
+  table.audit-table th {
+    border: 3px solid #000 !important;
   }
 }
