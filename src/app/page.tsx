@@ -96,6 +96,16 @@ export default function Home() {
     })
   }, [])
 
+  const resetToSinglePage = useCallback(() => {
+    if (typeof window !== 'undefined' && !window.confirm('Tout remettre sur une seule page ? Vous pourrez ensuite redécouper les pages comme vous voulez.')) return
+    setPages((prev) => {
+      if (prev.length <= 1) return prev
+      const first = prev[0]
+      const allRows = prev.flatMap((p) => p.rows)
+      return [{ ...first, rows: allRows }]
+    })
+  }, [])
+
   const handlePrint = useCallback(() => {
     window.print()
   }, [])
@@ -318,6 +328,15 @@ Section: 5. LEADERSHIP
           title="Coller une liste pour remplir le tableau"
         >
           Coller une liste
+        </button>
+        <button
+          type="button"
+          onClick={resetToSinglePage}
+          disabled={pages.length <= 1}
+          className="flex items-center justify-center gap-2 rounded-xl bg-amber-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none"
+          title="Remet tout le contenu sur une seule page ; vous pourrez ensuite redécouper avec le bouton ↵ sur chaque ligne"
+        >
+          Tout sur une page
         </button>
         <button
           type="button"
