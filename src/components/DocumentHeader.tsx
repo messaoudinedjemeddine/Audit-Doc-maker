@@ -70,7 +70,7 @@ export function DocumentHeader({
           />
         </div>
 
-        <div>
+        <div className="min-w-[380px]">
           <h1 className="text-lg font-bold uppercase tracking-wide text-slate-900">
             {readOnly ? (
               data.companyName
@@ -79,7 +79,7 @@ export function DocumentHeader({
                 type="text"
                 value={data.companyName}
                 onChange={(e) => onChange({ companyName: e.target.value })}
-                className="w-full min-w-[200px] rounded border-0 bg-transparent font-bold uppercase tracking-wide text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-[#ff8500] focus:ring-inset"
+                className="w-full min-w-[360px] rounded border-0 bg-transparent font-bold uppercase tracking-wide text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-[#ff8500] focus:ring-inset"
                 placeholder="Nom de l'entreprise"
               />
             )}

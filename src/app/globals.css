@@ -37,25 +37,25 @@
     background: transparent !important;
     box-shadow: none !important;
   }
-  /* Keep table cell borders visible when saving/printing */
+  /* Keep table cell borders visible when saving/printing - black */
   table td,
   table th {
-    border: 1px solid #64748b !important;
+    border: 1px solid #000 !important;
   }
 }
 
-/* Vertical lines between all columns (Exigences | Oui | Non | ... | Observation) */
+/* Vertical lines between all columns (Exigences | Oui | Non | ... | Observation) - black */
 table.audit-table td,
 table.audit-table th {
-  border: 1px solid #475569 !important;
+  border: 1px solid #000 !important;
 }
 
-/* Horizontal lines between observation cells - always visible (screen + print) */
+/* Horizontal lines between observation cells - black */
 td.observation-cell {
-  border-bottom: 1px solid #475569 !important;
+  border-bottom: 1px solid #000 !important;
 }
 @media print {
   td.observation-cell {
-    border-bottom: 1px solid #475569 !important;
+    border-bottom: 1px solid #000 !important;
   }
 }

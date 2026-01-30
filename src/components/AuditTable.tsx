@@ -178,7 +178,7 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
   }
 
   return (
-    <div className="overflow-x-auto border border-slate-500 bg-white shadow-sm">
+    <div className="overflow-x-auto border border-black bg-white shadow-sm">
       <table ref={tableRef} className="audit-table w-full table-fixed border-collapse">
         <colgroup>
           {COL_KEYS.map((key, i) => (
@@ -274,10 +274,10 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
         <tbody>
           {rows.map((row) =>
             row.type === 'section' ? (
-              <tr key={row.id} className="group border-b border-slate-500">
+              <tr key={row.id} className="group border-b border-black">
                 <td
                   colSpan={7}
-                  className="border-r border-b border-slate-500 px-3 py-3"
+                  className="border-r border-b border-black px-3 py-3"
                   style={sectionStyle}
                 >
                   <div className="flex items-center justify-between gap-2">
@@ -318,9 +318,9 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
             ) : (
               <tr
                 key={row.id}
-                className="group border-b border-slate-500 transition hover:bg-slate-50/50"
+                className="group border-b border-black transition hover:bg-slate-50/50"
               >
-                <td className="border border-slate-500 px-2 py-2 align-top" style={questionRowStyle}>
+                <td className="border border-black px-2 py-2 align-top" style={questionRowStyle}>
                   <div className="space-y-1">
                     {readOnly ? (
                       <>
@@ -352,7 +352,7 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                   </div>
                 </td>
                 {RESPONSE_OPTIONS.map((opt) => (
-                  <td key={opt} className="border border-slate-500 bg-white text-center align-middle">
+                  <td key={opt} className="border border-black bg-white text-center align-middle">
                     <button
                       type="button"
                       onClick={() => setResponse(row.id, opt)}
@@ -360,7 +360,7 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                       className="flex w-full items-center justify-center py-1 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#ff8500] disabled:pointer-events-none"
                       title={tableColumns[opt]}
                     >
-                      <div className="flex h-6 w-6 shrink-0 items-center justify-center border-2 border-slate-500 bg-white text-lg font-bold">
+                      <div className="flex h-6 w-6 shrink-0 items-center justify-center border-2 border-black bg-white text-lg font-bold">
                         {row.response === opt ? (
                           <span className="text-green-600">✔</span>
                         ) : null}
@@ -368,7 +368,7 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                     </button>
                   </td>
                 ))}
-                <td className="observation-cell relative border border-slate-500 align-middle px-2" style={questionRowStyle}>
+                <td className="observation-cell relative border border-black align-middle px-2" style={questionRowStyle}>
                   {readOnly ? (
                     row.observation ? (
                       <div className="min-h-[2rem] whitespace-pre-wrap py-1 text-center text-sm text-slate-700">{row.observation}</div>
@@ -413,7 +413,7 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
         {!readOnly && (
           <tfoot className="no-print">
             <tr>
-              <td colSpan={7} className="border border-dashed border-slate-500 bg-slate-50/80 px-4 py-3 text-center">
+              <td colSpan={7} className="border border-dashed border-black bg-slate-50/80 px-4 py-3 text-center">
                 <div className="flex flex-wrap justify-center gap-2">
                   <button
                     type="button"
