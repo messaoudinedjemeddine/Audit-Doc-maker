@@ -5,6 +5,7 @@ import type { AuditPageData } from '@/types/audit'
 import { defaultPageData } from '@/types/audit'
 import { AuditPage } from '@/components/AuditPage'
 import { exportDocument, importDocument } from '@/lib/audit-export'
+import { parseContentList } from '@/lib/parse-content-list'
 
 function createNewPage(): AuditPageData {
   return defaultPageData(crypto.randomUUID())
@@ -12,6 +13,8 @@ function createNewPage(): AuditPageData {
 
 export default function Home() {
   const [pages, setPages] = useState<AuditPageData[]>(() => [createNewPage()])
+  const [showContentModal, setShowContentModal] = useState(false)
+  const [contentListText, setContentListText] = useState('')
 
   const updatePage = useCallback((pageId: string, updates: Partial<AuditPageData>) => {
     setPages((prev) =>
@@ -82,9 +85,57 @@ export default function Home() {
   }, [pages])
 
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const listFileInputRef = useRef<HTMLInputElement>(null)
+
   const handleImportClick = useCallback(() => {
     fileInputRef.current?.click()
   }, [])
+
+  const handleImportListClick = useCallback(() => {
+    listFileInputRef.current?.click()
+  }, [])
+
+  const LIST_TEMPLATE = `Section: 4. CONTEXTE DE L'ORGANISATION
+4.1 Compréhension de l'organisation | L'organisation a-t-elle déterminé les enjeux externes et internes pertinents pour son objectif ?
+4.2 Parties intéressées | Les exigences des parties intéressées ont-elles été identifiées ?
+Section: 5. LEADERSHIP
+5.1 Leadership et engagement | La direction a-t-elle démontré son engagement ?
+5.2 Politique | La politique est-elle appropriée et communiquée ?`
+
+  const handleDownloadListTemplate = useCallback(() => {
+    const blob = new Blob([LIST_TEMPLATE], { type: 'text/plain;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'modele-liste-audit.txt'
+    a.click()
+    URL.revokeObjectURL(url)
+  }, [])
+
+  const handleImportListFile = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      const text = reader.result as string
+      const rows = parseContentList(text)
+      if (rows.length === 0) {
+        if (typeof window !== 'undefined') {
+          window.alert('Aucune ligne reconnue dans le fichier. Utilisez le format : Section: titre, ou Titre | Question')
+        }
+        return
+      }
+      const firstPageId = pages[0]?.id
+      if (firstPageId) {
+        updatePage(firstPageId, { rows })
+        if (typeof window !== 'undefined') {
+          window.alert(`${rows.length} ligne(s) importée(s). Le tableau a été rempli.`)
+        }
+      }
+    }
+    reader.readAsText(file, 'UTF-8')
+    e.target.value = ''
+  }, [pages, updatePage])
 
   const handleImportFile = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -107,6 +158,25 @@ export default function Home() {
     reader.readAsText(file, 'UTF-8')
     e.target.value = ''
   }, [])
+
+  const handleFillFromList = useCallback(() => {
+    const rows = parseContentList(contentListText)
+    if (rows.length === 0) {
+      if (typeof window !== 'undefined') {
+        window.alert('Aucune ligne reconnue. Utilisez le format indiqué dans la boîte.')
+      }
+      return
+    }
+    const firstPageId = pages[0]?.id
+    if (firstPageId) {
+      updatePage(firstPageId, { rows })
+      setShowContentModal(false)
+      setContentListText('')
+      if (typeof window !== 'undefined') {
+        window.alert(`${rows.length} ligne(s) ajoutée(s) au tableau.`)
+      }
+    }
+  }, [contentListText, pages, updatePage])
 
   return (
     <div className="min-h-screen bg-slate-100 py-8 print:bg-white print:py-0">
@@ -161,6 +231,14 @@ export default function Home() {
           aria-hidden
           onChange={handleImportFile}
         />
+        <input
+          ref={listFileInputRef}
+          type="file"
+          accept=".txt,text/plain"
+          className="hidden"
+          aria-hidden
+          onChange={handleImportListFile}
+        />
         <button
           type="button"
           onClick={handleExportDocument}
@@ -176,6 +254,29 @@ export default function Home() {
           title="Ouvrir un fichier .json précédemment exporté"
         >
           Importer un document
+        </button>
+        <button
+          type="button"
+          onClick={handleImportListClick}
+          className="flex items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-2"
+          title="Importer un fichier .txt pour remplir le tableau (format : Section: titre, ou Titre | Question)"
+        >
+          Importer une liste
+        </button>
+        <button
+          type="button"
+          onClick={handleDownloadListTemplate}
+          className="text-[10px] text-violet-600 hover:underline"
+        >
+          Télécharger le modèle .txt
+        </button>
+        <button
+          type="button"
+          onClick={() => setShowContentModal(true)}
+          className="flex items-center justify-center gap-2 rounded-xl bg-violet-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:bg-violet-600 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-2"
+          title="Coller une liste pour remplir le tableau"
+        >
+          Coller une liste
         </button>
         <button
           type="button"
@@ -204,6 +305,55 @@ export default function Home() {
           Imprimer
         </button>
       </nav>
+
+      {/* Modal: fill table from pasted list */}
+      {showContentModal && (
+        <div className="no-print fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4">
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-xl">
+            <div className="border-b border-slate-200 px-6 py-4">
+              <h2 className="text-lg font-bold text-slate-900">Remplir le tableau</h2>
+              <p className="mt-1 text-sm text-slate-600">
+                Collez votre liste ci-dessous. Une ligne par section ou par item.
+              </p>
+              <p className="mt-2 text-xs text-slate-500">
+                <strong>Section :</strong> commencez une ligne par &quot;Section :&quot; pour un titre de section.
+                <br />
+                <strong>Item avec question :</strong> utilisez &quot; | &quot; entre le titre et la question (ex. 4.1 Titre | La question ici ?).
+                <br />
+                <strong>Item seul :</strong> une ligne sans &quot;Section :&quot; ni &quot;|&quot; = titre d&apos;item (sans question).
+              </p>
+            </div>
+            <div className="p-6">
+              <textarea
+                value={contentListText}
+                onChange={(e) => setContentListText(e.target.value)}
+                placeholder={"Section: 4. CONTEXTE DE L'ORGANISATION\n4.1 Compréhension | L'organisation a-t-elle déterminé les enjeux ?\n4.2 Parties intéressées | Les exigences ont-elles été identifiées ?"}
+                rows={12}
+                className="w-full rounded-lg border border-slate-300 p-3 text-sm text-slate-800 placeholder:text-slate-400 focus:border-[#ff8500] focus:outline-none focus:ring-2 focus:ring-[#ff8500]/20"
+              />
+            </div>
+            <div className="flex justify-end gap-3 border-t border-slate-200 px-6 py-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowContentModal(false)
+                  setContentListText('')
+                }}
+                className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              >
+                Annuler
+              </button>
+              <button
+                type="button"
+                onClick={handleFillFromList}
+                className="rounded-xl bg-[#ff8500] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#e67600] focus:outline-none focus:ring-2 focus:ring-[#ff8500] focus:ring-offset-2"
+              >
+                Remplir le tableau
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Document area - offset for left navbar */}
       <div id="document-area" className="mx-auto flex max-w-[230mm] flex-col gap-8 px-4 pl-56 print:max-w-none print:gap-0 print:px-0 print:pl-0">
