@@ -105,6 +105,7 @@ export function AuditTable({ data, onChange, readOnly, onInsertPageBreakAbove, c
   const questionRowStyle = { backgroundColor: questionRowColor }
   const compact = compactMode ?? false
   const cellPadding = compact ? 'px-1.5 py-1' : 'px-2 py-2'
+  const cellPaddingNoBottom = compact ? 'px-1.5 pt-1 pb-0' : 'px-2 pt-2 pb-0'
   const thPadding = compact ? 'px-1 py-1' : 'px-2 py-2'
 
   const tableRef = useRef<HTMLTableElement>(null)
@@ -320,8 +321,8 @@ export function AuditTable({ data, onChange, readOnly, onInsertPageBreakAbove, c
                 {COL_KEYS.map((key) => {
                   if (key === 'exigences') {
                     return (
-                      <td key={key} className={`border border-black ${cellPadding} align-top`} style={questionRowStyle}>
-                        <div className={compact ? 'space-y-0.5' : 'space-y-1'}>
+                      <td key={key} className={`border border-black ${cellPaddingNoBottom} align-top`} style={questionRowStyle}>
+                        <div className={`${compact ? 'space-y-0.5' : 'space-y-1'} mb-0`}>
                           {readOnly ? (
                             <>
                               <div className="text-xs font-semibold text-slate-900 break-words">{row.title}</div>
@@ -342,7 +343,7 @@ export function AuditTable({ data, onChange, readOnly, onInsertPageBreakAbove, c
                                 onChange={(e) => updateQuestion(row.id, { description: e.target.value })}
                                 minHeight={compact ? 40 : 64}
                                 rows={compact ? 2 : 3}
-                                className="mt-1 w-full min-h-[4rem] resize-none overflow-hidden border-0 bg-transparent text-[11px] text-slate-600 leading-snug placeholder:text-slate-400 focus:ring-2 focus:ring-[#ff8500] focus:ring-inset"
+                                className="mt-1 w-full min-h-0 resize-none overflow-hidden border-0 bg-transparent text-[11px] text-slate-600 leading-snug placeholder:text-slate-400 focus:ring-2 focus:ring-[#ff8500] focus:ring-inset [margin-bottom:0]"
                                 placeholder="Description (paragraphe)"
                               />
                             </>
@@ -353,10 +354,10 @@ export function AuditTable({ data, onChange, readOnly, onInsertPageBreakAbove, c
                   }
                   if (key === 'observation') {
                     return (
-                      <td key={key} className={`observation-cell relative border border-black align-middle ${cellPadding}`} style={questionRowStyle}>
+                      <td key={key} className={`observation-cell relative border border-black align-middle ${cellPaddingNoBottom}`} style={questionRowStyle}>
                         {readOnly ? (
                           row.observation ? (
-                            <div className={`whitespace-pre-wrap text-center text-sm text-slate-700 ${compact ? 'min-h-[1.5rem] py-0.5' : 'min-h-[2rem] py-1'}`}>{row.observation}</div>
+                            <div className={`whitespace-pre-wrap text-center text-sm text-slate-700 ${compact ? 'min-h-[1.5rem] pt-0.5 pb-0' : 'min-h-[2rem] pt-1 pb-0'}`}>{row.observation}</div>
                           ) : (
                             <div className="flex justify-center"><DottedLines lines={compact ? 2 : 3} /></div>
                           )
@@ -367,7 +368,7 @@ export function AuditTable({ data, onChange, readOnly, onInsertPageBreakAbove, c
                             minHeight={compact ? 32 : 48}
                             placeholder="Saisir les observations..."
                             rows={compact ? 2 : 3}
-                            className="observation-textarea min-h-[2rem] w-full resize-none overflow-hidden border-0 bg-transparent py-1 text-center text-sm text-slate-700 placeholder:text-slate-400 focus:ring-2 focus:ring-[#ff8500] focus:ring-inset"
+                            className="observation-textarea min-h-0 w-full resize-none overflow-hidden border-0 bg-transparent pt-1 pb-0 text-center text-sm text-slate-700 placeholder:text-slate-400 focus:ring-2 focus:ring-[#ff8500] focus:ring-inset"
                           />
                         )}
                         {!readOnly && (
