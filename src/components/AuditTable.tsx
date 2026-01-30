@@ -114,7 +114,7 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                 style={headerStyle}
               >
                 {readOnly ? (
-                  tableColumns[key]
+                  <span className="whitespace-pre-line">{tableColumns[key]}</span>
                 ) : (
                   <input
                     type="text"
@@ -125,6 +125,7 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                       })
                     }
                     className="w-full border-0 bg-transparent text-center text-white placeholder:text-white/70 focus:ring-2 focus:ring-white focus:ring-inset"
+                    placeholder={key === 'nonConcerne' ? 'Non\nconcerné' : key === 'affirmeParOperateur' ? "Affirmé par\nl'opérateur" : undefined}
                   />
                 )}
               </th>
@@ -200,8 +201,8 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                   <div className="space-y-1">
                     {readOnly ? (
                       <>
-                        <div className="font-semibold text-slate-900">{row.title}</div>
-                        <div className="text-xs text-slate-600">{row.description}</div>
+                        <div className="text-xs font-semibold text-slate-900">{row.title}</div>
+                        <div className="text-[11px] text-slate-600 leading-snug">{row.description}</div>
                       </>
                     ) : (
                       <>
@@ -209,7 +210,7 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                           type="text"
                           value={row.title}
                           onChange={(e) => updateQuestion(row.id, { title: e.target.value })}
-                          className="w-full border-0 bg-transparent text-sm font-semibold text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-[#ff8500] focus:ring-inset"
+                          className="w-full border-0 bg-transparent text-xs font-semibold text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-[#ff8500] focus:ring-inset"
                           placeholder="Titre de l'élément"
                         />
                         <textarea
@@ -218,7 +219,7 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                             updateQuestion(row.id, { description: e.target.value })
                           }
                           rows={3}
-                          className="mt-1 w-full min-h-[4rem] resize-y border-0 bg-transparent text-xs text-slate-600 placeholder:text-slate-400 focus:ring-2 focus:ring-[#ff8500] focus:ring-inset"
+                          className="mt-1 w-full min-h-[4rem] resize-y border-0 bg-transparent text-[11px] text-slate-600 leading-snug placeholder:text-slate-400 focus:ring-2 focus:ring-[#ff8500] focus:ring-inset"
                           placeholder="Description (paragraphe)"
                         />
                       </>

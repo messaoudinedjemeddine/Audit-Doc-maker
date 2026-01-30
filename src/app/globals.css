@@ -28,11 +28,18 @@
     box-shadow: none !important;
     -webkit-appearance: none;
     appearance: none;
+    /* Hide textarea resize handle (paragraph/extend icon) when saving/printing */
+    resize: none !important;
   }
   /* Buttons in document: hide or make look like static content */
   button {
     border: none !important;
     background: transparent !important;
     box-shadow: none !important;
+  }
+  /* Keep table cell borders visible when saving/printing */
+  table td,
+  table th {
+    border: 1px solid #64748b !important;
   }
 }

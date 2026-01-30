@@ -75,9 +75,9 @@ export const defaultPageData = (id: string): AuditPageData => ({
     exigences: 'Exigences',
     oui: 'Oui',
     non: 'Non',
-    nonConcerne: 'Non concerné',
+    nonConcerne: 'Non\nconcerné',
     observe: 'Observe',
-    affirmeParOperateur: "Affirmé par l'opérateur",
+    affirmeParOperateur: "Affirmé par\nl'opérateur",
     observation: 'Observation',
   },
   rows: [
