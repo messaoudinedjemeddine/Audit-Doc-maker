@@ -37,25 +37,28 @@
     background: transparent !important;
     box-shadow: none !important;
   }
-  /* Keep table cell borders visible when saving/printing - black */
+  /* Keep table cell borders visible when saving/printing - black, same weight for all (including observation) */
   table td,
   table th {
-    border: 1px solid #000 !important;
+    border: 2px solid #000 !important;
+  }
+  td.observation-cell {
+    border: 2px solid #000 !important;
   }
 }
 
 /* Vertical lines between all columns (Exigences | Oui | Non | ... | Observation) - black */
 table.audit-table td,
 table.audit-table th {
-  border: 1px solid #000 !important;
+  border: 2px solid #000 !important;
 }
 
-/* Horizontal lines between observation cells - black */
+/* Observation cells: same bold borders on all sides (screen + print) */
 td.observation-cell {
-  border-bottom: 1px solid #000 !important;
+  border: 2px solid #000 !important;
 }
 @media print {
   td.observation-cell {
-    border-bottom: 1px solid #000 !important;
+    border: 2px solid #000 !important;
   }
 }

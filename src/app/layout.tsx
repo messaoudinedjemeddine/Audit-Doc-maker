@@ -5,7 +5,7 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
 export const metadata: Metadata = {
-  title: 'Aridj best auditor',
+  title: 'Document d\'audit',
   description: 'Create and edit internal audit documents for ISO 14001:2015',
 }
 

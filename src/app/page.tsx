@@ -189,10 +189,13 @@ export default function Home() {
           type="button"
           onClick={handleSavePdf}
           className="flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2"
-          title="Ouvre la boîte d'impression — choisir « Enregistrer au format PDF » comme destination"
+          title="Ouvre la boîte d'impression. Pour ne pas afficher la date, le titre et l'URL sur le PDF : décocher « En-têtes et pieds de page » (ou « Headers and footers »)."
         >
           Enregistrer en PDF
         </button>
+        <p className="text-[10px] leading-tight text-slate-500">
+          PDF sans date ni lien : dans la fenêtre d&apos;impression, décocher « En-têtes et pieds de page ».
+        </p>
         <button
           type="button"
           onClick={handlePrint}
