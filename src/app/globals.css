@@ -45,6 +45,16 @@
   td.observation-cell {
     border: 2px solid #000 !important;
   }
+
+  /* Auto page break: don't split table rows; flow to next A4 page when one is full */
+  table.audit-table tbody tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  /* Repeat table header (Exigences, Oui, Non, etc.) on each new printed page */
+  table.audit-table thead {
+    display: table-header-group;
+  }
 }
 
 /* Vertical lines between all columns (Exigences | Oui | Non | ... | Observation) - black */
