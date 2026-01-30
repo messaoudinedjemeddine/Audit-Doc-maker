@@ -43,3 +43,13 @@
     border: 1px solid #64748b !important;
   }
 }
+
+/* Horizontal lines between observation cells - always visible (screen + print) */
+td.observation-cell {
+  border-bottom: 1px solid #475569 !important;
+}
+@media print {
+  td.observation-cell {
+    border-bottom: 1px solid #475569 !important;
+  }
+}

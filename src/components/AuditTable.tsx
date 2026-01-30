@@ -113,7 +113,19 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                 className="w-[9%] border px-1 py-2 text-center text-[10px] font-semibold uppercase leading-tight tracking-wide text-white"
                 style={headerStyle}
               >
-                {readOnly ? (
+                {(key === 'nonConcerne' || key === 'affirmeParOperateur') ? (
+                  <textarea
+                    value={tableColumns[key]}
+                    onChange={(e) =>
+                      onChange({
+                        tableColumns: { ...tableColumns, [key]: e.target.value },
+                      })
+                    }
+                    rows={2}
+                    className="w-full resize-none border-0 bg-transparent text-center text-white placeholder:text-white/70 focus:ring-2 focus:ring-white focus:ring-inset"
+                    placeholder={key === 'nonConcerne' ? 'Non\nconcerné' : "Affirmé par\nl'opérateur"}
+                  />
+                ) : readOnly ? (
                   <span className="whitespace-pre-line">{tableColumns[key]}</span>
                 ) : (
                   <input
@@ -125,7 +137,6 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                       })
                     }
                     className="w-full border-0 bg-transparent text-center text-white placeholder:text-white/70 focus:ring-2 focus:ring-white focus:ring-inset"
-                    placeholder={key === 'nonConcerne' ? 'Non\nconcerné' : key === 'affirmeParOperateur' ? "Affirmé par\nl'opérateur" : undefined}
                   />
                 )}
               </th>
@@ -243,7 +254,7 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                     </button>
                   </td>
                 ))}
-                <td className="relative w-[28%] border border-slate-500 align-top px-2" style={questionRowStyle}>
+                <td className="observation-cell relative w-[28%] border border-slate-500 align-top px-2" style={questionRowStyle}>
                   {readOnly ? (
                     row.observation ? (
                       <div className="min-h-[2rem] whitespace-pre-wrap py-1 text-sm text-slate-700">{row.observation}</div>
