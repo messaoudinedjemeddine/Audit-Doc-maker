@@ -13,6 +13,7 @@ interface AuditPageProps {
   pageIndex: number
   totalPages: number
   readOnly?: boolean
+  compactMode?: boolean
 }
 
 export function AuditPage({
@@ -24,6 +25,7 @@ export function AuditPage({
   pageIndex,
   totalPages,
   readOnly,
+  compactMode,
 }: AuditPageProps) {
   return (
     <div className="mx-auto w-[210mm] min-h-[297mm] rounded-2xl border border-slate-200 bg-white p-6 shadow-card print:min-h-0 print:rounded-none print:border-0 print:shadow-none print:break-after-page">
@@ -39,6 +41,7 @@ export function AuditPage({
         onChange={onChange}
         readOnly={readOnly}
         onInsertPageBreakAbove={onInsertPageBreakAbove}
+        compactMode={compactMode}
       />
 
       {!readOnly && !isFirstPage && onRemove && (

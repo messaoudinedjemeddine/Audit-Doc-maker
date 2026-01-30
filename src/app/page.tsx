@@ -15,6 +15,7 @@ export default function Home() {
   const [pages, setPages] = useState<AuditPageData[]>(() => [createNewPage()])
   const [showContentModal, setShowContentModal] = useState(false)
   const [contentListText, setContentListText] = useState('')
+  const [compactMode, setCompactMode] = useState(false)
 
   const updatePage = useCallback((pageId: string, updates: Partial<AuditPageData>) => {
     setPages((prev) =>
@@ -252,6 +253,15 @@ Section: 5. LEADERSHIP
             title="Couleur des lignes de question"
           />
         </label>
+        <label className="no-print flex cursor-pointer items-center gap-2 text-sm text-slate-700">
+          <input
+            type="checkbox"
+            checked={compactMode}
+            onChange={(e) => setCompactMode(e.target.checked)}
+            className="h-4 w-4 rounded border-slate-300 text-[#ff8500] focus:ring-[#ff8500]"
+          />
+          <span>Mode compact (moins de pages)</span>
+        </label>
         <div className="my-2 border-t border-white/20" />
         <input
           ref={fileInputRef}
@@ -398,6 +408,7 @@ Section: 5. LEADERSHIP
               isFirstPage={index === 0}
               pageIndex={index}
               totalPages={pages.length}
+              compactMode={compactMode}
             />
           </div>
         ))}

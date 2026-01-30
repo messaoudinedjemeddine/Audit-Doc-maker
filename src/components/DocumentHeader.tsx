@@ -115,7 +115,8 @@ export function DocumentHeader({
           )}
         </div>
 
-        {/* Metadata as table: left = title, right = value */}
+        {/* Metadata as table: only on first page */}
+        {pageIndex === 0 && (
         <div className="mt-2 overflow-hidden rounded border border-slate-300 bg-white text-sm text-slate-600">
           <table className="w-full min-w-[220px] table-fixed border-collapse">
             <tbody>
@@ -206,6 +207,7 @@ export function DocumentHeader({
             </div>
           )}
         </div>
+        )}
 
         <div className="mt-2 text-xs font-medium text-slate-500">
           Page {pageIndex + 1} sur {totalPages}

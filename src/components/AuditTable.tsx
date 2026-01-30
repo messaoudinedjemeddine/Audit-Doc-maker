@@ -36,6 +36,7 @@ interface AuditTableProps {
   onChange: (updates: Partial<AuditPageData>) => void
   readOnly?: boolean
   onInsertPageBreakAbove?: (rowIndex: number) => void
+  compactMode?: boolean
 }
 
 function updateRow(rows: TableRow[], id: string, updates: Partial<TableRow>): TableRow[] {
@@ -73,7 +74,8 @@ function DottedLines({ lines = 3 }: { lines?: number }) {
 
 const RESPONSE_OPTIONS: ResponseOption[] = ['oui', 'non', 'nonConcerne', 'observe', 'affirmeParOperateur']
 
-const COL_KEYS = ['exigences', ...RESPONSE_OPTIONS, 'observation'] as const
+/** Column order: Oui, Non, Non concerné, Observation (text), Observe, Affirmé par l'opérateur */
+const COL_KEYS = ['exigences', 'oui', 'non', 'nonConcerne', 'observation', 'observe', 'affirmeParOperateur'] as const
 
 const DEFAULT_WIDTHS = {
   exigences: 28,
@@ -87,12 +89,23 @@ const DEFAULT_WIDTHS = {
 
 const MIN_COL_WIDTH_PCT = 3
 
-export function AuditTable({ data, onChange, readOnly, onInsertPageBreakAbove }: AuditTableProps) {
+function CheckedIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-full w-full text-green-600">
+      <path d="M18 6L6 18M6 6l12 12" />
+    </svg>
+  )
+}
+
+export function AuditTable({ data, onChange, readOnly, onInsertPageBreakAbove, compactMode }: AuditTableProps) {
   const { rows, tableColumns, tableColumnWidths, headerColor, sectionHeaderColor, questionRowColor } = data
   const widths = tableColumnWidths ?? DEFAULT_WIDTHS
   const headerStyle = { backgroundColor: headerColor, borderColor: headerColor }
   const sectionStyle = { backgroundColor: sectionHeaderColor }
   const questionRowStyle = { backgroundColor: questionRowColor }
+  const compact = compactMode ?? false
+  const cellPadding = compact ? 'px-1.5 py-1' : 'px-2 py-2'
+  const thPadding = compact ? 'px-1 py-1' : 'px-2 py-2'
 
   const tableRef = useRef<HTMLTableElement>(null)
   const [resizingAfter, setResizingAfter] = useState<number | null>(null)
@@ -188,88 +201,61 @@ export function AuditTable({ data, onChange, readOnly, onInsertPageBreakAbove }:
         </colgroup>
         <thead>
           <tr style={headerStyle}>
-            <th className="relative border px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-white" style={headerStyle}>
-              {readOnly ? (
-                tableColumns.exigences
+            {COL_KEYS.map((key, i) => (
+              key === 'exigences' ? (
+                <th key={key} className={`relative border ${thPadding} text-left text-xs font-semibold uppercase tracking-wide text-white`} style={headerStyle}>
+                  {readOnly ? tableColumns.exigences : (
+                    <input
+                      type="text"
+                      value={tableColumns.exigences}
+                      onChange={(e) => onChange({ tableColumns: { ...tableColumns, exigences: e.target.value } })}
+                      className="w-full border-0 bg-transparent text-white placeholder:text-white/70 focus:ring-2 focus:ring-white focus:ring-inset"
+                    />
+                  )}
+                  {!readOnly && (
+                    <div className="no-print absolute right-0 top-0 z-10 h-full w-1.5 cursor-col-resize hover:bg-white/30" title="Glisser pour redimensionner" onMouseDown={(e) => handleResizeStart(0, e.clientX)} aria-hidden />
+                  )}
+                </th>
+              ) : key === 'observation' ? (
+                <th key={key} className={`relative border ${thPadding} text-center text-xs font-semibold uppercase tracking-wide text-white align-middle`} style={headerStyle}>
+                  {readOnly ? tableColumns.observation : (
+                    <input
+                      type="text"
+                      value={tableColumns.observation}
+                      onChange={(e) => onChange({ tableColumns: { ...tableColumns, observation: e.target.value } })}
+                      className="w-full border-0 bg-transparent text-center text-white placeholder:text-white/70 focus:ring-2 focus:ring-white focus:ring-inset"
+                    />
+                  )}
+                  {!readOnly && i < COL_KEYS.length - 1 && (
+                    <div className="no-print absolute right-0 top-0 z-10 h-full w-1.5 cursor-col-resize hover:bg-white/30" title="Glisser pour redimensionner" onMouseDown={(e) => handleResizeStart(i, e.clientX)} aria-hidden />
+                  )}
+                </th>
               ) : (
-                <input
-                  type="text"
-                  value={tableColumns.exigences}
-                  onChange={(e) =>
-                    onChange({
-                      tableColumns: { ...tableColumns, exigences: e.target.value },
-                    })
-                  }
-                  className="w-full border-0 bg-transparent text-white placeholder:text-white/70 focus:ring-2 focus:ring-white focus:ring-inset"
-                />
-              )}
-              {!readOnly && (
-                <div
-                  className="no-print absolute right-0 top-0 z-10 h-full w-1.5 cursor-col-resize hover:bg-white/30"
-                  title="Glisser pour redimensionner"
-                  onMouseDown={(e) => handleResizeStart(0, e.clientX)}
-                  aria-hidden
-                />
-              )}
-            </th>
-            {RESPONSE_OPTIONS.map((key, i) => (
-              <th
-                key={key}
-                className="relative border px-1 py-2 text-center text-[10px] font-semibold uppercase leading-tight tracking-wide text-white"
-                style={headerStyle}
-              >
-                {(key === 'nonConcerne' || key === 'affirmeParOperateur') ? (
-                  <textarea
-                    value={tableColumns[key]}
-                    onChange={(e) =>
-                      onChange({
-                        tableColumns: { ...tableColumns, [key]: e.target.value },
-                      })
-                    }
-                    rows={2}
-                    className="w-full resize-none border-0 bg-transparent text-center text-white placeholder:text-white/70 focus:ring-2 focus:ring-white focus:ring-inset"
-                    placeholder={key === 'nonConcerne' ? 'Non\nconcerné' : "Affirmé par\nl'opérateur"}
-                  />
-                ) : readOnly ? (
-                  <span className="whitespace-pre-line">{tableColumns[key]}</span>
-                ) : (
-                  <input
-                    type="text"
-                    value={tableColumns[key]}
-                    onChange={(e) =>
-                      onChange({
-                        tableColumns: { ...tableColumns, [key]: e.target.value },
-                      })
-                    }
-                    className="w-full border-0 bg-transparent text-center text-white placeholder:text-white/70 focus:ring-2 focus:ring-white focus:ring-inset"
-                  />
-                )}
-                {!readOnly && (
-                  <div
-                    className="no-print absolute right-0 top-0 z-10 h-full w-1.5 cursor-col-resize hover:bg-white/30"
-                    title="Glisser pour redimensionner"
-                    onMouseDown={(e) => handleResizeStart(i + 1, e.clientX)}
-                    aria-hidden
-                  />
-                )}
-              </th>
+                <th key={key} className={`relative border ${thPadding} text-center text-[10px] font-semibold uppercase leading-tight tracking-wide text-white`} style={headerStyle}>
+                  {(key === 'nonConcerne' || key === 'affirmeParOperateur') ? (
+                    <textarea
+                      value={tableColumns[key]}
+                      onChange={(e) => onChange({ tableColumns: { ...tableColumns, [key]: e.target.value } })}
+                      rows={compact ? 1 : 2}
+                      className="w-full resize-none border-0 bg-transparent text-center text-white placeholder:text-white/70 focus:ring-2 focus:ring-white focus:ring-inset"
+                      placeholder={key === 'nonConcerne' ? 'Non\nconcerné' : "Affirmé par\nl'opérateur"}
+                    />
+                  ) : readOnly ? (
+                    <span className="whitespace-pre-line">{tableColumns[key]}</span>
+                  ) : (
+                    <input
+                      type="text"
+                      value={tableColumns[key]}
+                      onChange={(e) => onChange({ tableColumns: { ...tableColumns, [key]: e.target.value } })}
+                      className="w-full border-0 bg-transparent text-center text-white placeholder:text-white/70 focus:ring-2 focus:ring-white focus:ring-inset"
+                    />
+                  )}
+                  {!readOnly && i < COL_KEYS.length - 1 && (
+                    <div className="no-print absolute right-0 top-0 z-10 h-full w-1.5 cursor-col-resize hover:bg-white/30" title="Glisser pour redimensionner" onMouseDown={(e) => handleResizeStart(i, e.clientX)} aria-hidden />
+                  )}
+                </th>
+              )
             ))}
-            <th className="border px-2 py-2 text-center text-xs font-semibold uppercase tracking-wide text-white align-middle" style={headerStyle}>
-              {readOnly ? (
-                tableColumns.observation
-              ) : (
-                <input
-                  type="text"
-                  value={tableColumns.observation}
-                  onChange={(e) =>
-                    onChange({
-                      tableColumns: { ...tableColumns, observation: e.target.value },
-                    })
-                  }
-                  className="w-full border-0 bg-transparent text-center text-white placeholder:text-white/70 focus:ring-2 focus:ring-white focus:ring-inset"
-                />
-              )}
-            </th>
           </tr>
         </thead>
         <tbody>
@@ -278,7 +264,7 @@ export function AuditTable({ data, onChange, readOnly, onInsertPageBreakAbove }:
               <tr key={row.id} className="group border-b border-black">
                 <td
                   colSpan={7}
-                  className="border-r border-b border-black px-3 py-3"
+                  className={`border-r border-b border-black ${compact ? 'px-2 py-1.5' : 'px-3 py-3'}`}
                   style={sectionStyle}
                 >
                   <div className="flex items-center justify-between gap-2">
@@ -331,102 +317,88 @@ export function AuditTable({ data, onChange, readOnly, onInsertPageBreakAbove }:
                 key={row.id}
                 className="group border-b border-black transition hover:bg-slate-50/50"
               >
-                <td className="border border-black px-2 py-2 align-top" style={questionRowStyle}>
-                  <div className="space-y-1">
-                    {readOnly ? (
-                      <>
-                        <div className="text-xs font-semibold text-slate-900 break-words">{row.title}</div>
-                        <div className="text-[11px] text-slate-600 leading-snug break-words">{row.description}</div>
-                      </>
-                    ) : (
-                      <>
-                        <AutoResizeTextarea
-                          value={row.title}
-                          onChange={(e) => updateQuestion(row.id, { title: e.target.value })}
-                          minHeight={24}
-                          rows={1}
-                          className="w-full min-h-0 resize-none overflow-hidden border-0 bg-transparent text-xs font-semibold text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-[#ff8500] focus:ring-inset"
-                          placeholder="Titre de l'élément"
-                        />
-                        <AutoResizeTextarea
-                          value={row.description}
-                          onChange={(e) =>
-                            updateQuestion(row.id, { description: e.target.value })
-                          }
-                          minHeight={64}
-                          rows={3}
-                          className="mt-1 w-full min-h-[4rem] resize-none overflow-hidden border-0 bg-transparent text-[11px] text-slate-600 leading-snug placeholder:text-slate-400 focus:ring-2 focus:ring-[#ff8500] focus:ring-inset"
-                          placeholder="Description (paragraphe)"
-                        />
-                      </>
-                    )}
-                  </div>
-                </td>
-                {RESPONSE_OPTIONS.map((opt) => (
-                  <td key={opt} className="border border-black bg-white text-center align-middle">
-                    <button
-                      type="button"
-                      onClick={() => setResponse(row.id, opt)}
-                      disabled={readOnly}
-                      className="flex w-full items-center justify-center py-1 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#ff8500] disabled:pointer-events-none"
-                      title={tableColumns[opt]}
-                    >
-                      <div className="flex h-6 w-6 shrink-0 items-center justify-center border-2 border-black bg-white text-lg font-bold">
-                        {row.response === opt ? (
-                          <span className="text-green-600">✔</span>
-                        ) : null}
-                      </div>
-                    </button>
-                  </td>
-                ))}
-                <td className="observation-cell relative border border-black align-middle px-2" style={questionRowStyle}>
-                  {readOnly ? (
-                    row.observation ? (
-                      <div className="min-h-[2rem] whitespace-pre-wrap py-1 text-center text-sm text-slate-700">{row.observation}</div>
-                    ) : (
-                      <div className="flex justify-center"><DottedLines lines={3} /></div>
+                {COL_KEYS.map((key) => {
+                  if (key === 'exigences') {
+                    return (
+                      <td key={key} className={`border border-black ${cellPadding} align-top`} style={questionRowStyle}>
+                        <div className={compact ? 'space-y-0.5' : 'space-y-1'}>
+                          {readOnly ? (
+                            <>
+                              <div className="text-xs font-semibold text-slate-900 break-words">{row.title}</div>
+                              <div className="text-[11px] text-slate-600 leading-snug break-words">{row.description}</div>
+                            </>
+                          ) : (
+                            <>
+                              <AutoResizeTextarea
+                                value={row.title}
+                                onChange={(e) => updateQuestion(row.id, { title: e.target.value })}
+                                minHeight={compact ? 20 : 24}
+                                rows={1}
+                                className="w-full min-h-0 resize-none overflow-hidden border-0 bg-transparent text-xs font-semibold text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-[#ff8500] focus:ring-inset"
+                                placeholder="Titre de l'élément"
+                              />
+                              <AutoResizeTextarea
+                                value={row.description}
+                                onChange={(e) => updateQuestion(row.id, { description: e.target.value })}
+                                minHeight={compact ? 40 : 64}
+                                rows={compact ? 2 : 3}
+                                className="mt-1 w-full min-h-[4rem] resize-none overflow-hidden border-0 bg-transparent text-[11px] text-slate-600 leading-snug placeholder:text-slate-400 focus:ring-2 focus:ring-[#ff8500] focus:ring-inset"
+                                placeholder="Description (paragraphe)"
+                              />
+                            </>
+                          )}
+                        </div>
+                      </td>
                     )
-                  ) : (
-                    <AutoResizeTextarea
-                      value={row.observation}
-                      onChange={(e) => updateQuestion(row.id, { observation: e.target.value })}
-                      minHeight={48}
-                      placeholder="Saisir les observations..."
-                      rows={3}
-                      className="observation-textarea min-h-[2rem] w-full resize-none overflow-hidden border-0 bg-transparent py-1 text-center text-sm text-slate-700 placeholder:text-slate-400 focus:ring-2 focus:ring-[#ff8500] focus:ring-inset"
-                    />
-                  )}
-                  {!readOnly && (
-                    <div className="no-print absolute right-1 top-1 flex gap-1 opacity-0 transition group-hover:opacity-100">
-                      {onInsertPageBreakAbove && rowIndex >= 1 && rows.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => onInsertPageBreakAbove(rowIndex)}
-                          className="flex h-6 w-6 items-center justify-center rounded-full bg-violet-100 text-xs text-violet-700 hover:bg-violet-200"
-                          title="Nouvelle page à partir de cette ligne"
-                        >
-                          ↵
-                        </button>
-                      )}
+                  }
+                  if (key === 'observation') {
+                    return (
+                      <td key={key} className={`observation-cell relative border border-black align-middle ${cellPadding}`} style={questionRowStyle}>
+                        {readOnly ? (
+                          row.observation ? (
+                            <div className={`whitespace-pre-wrap text-center text-sm text-slate-700 ${compact ? 'min-h-[1.5rem] py-0.5' : 'min-h-[2rem] py-1'}`}>{row.observation}</div>
+                          ) : (
+                            <div className="flex justify-center"><DottedLines lines={compact ? 2 : 3} /></div>
+                          )
+                        ) : (
+                          <AutoResizeTextarea
+                            value={row.observation}
+                            onChange={(e) => updateQuestion(row.id, { observation: e.target.value })}
+                            minHeight={compact ? 32 : 48}
+                            placeholder="Saisir les observations..."
+                            rows={compact ? 2 : 3}
+                            className="observation-textarea min-h-[2rem] w-full resize-none overflow-hidden border-0 bg-transparent py-1 text-center text-sm text-slate-700 placeholder:text-slate-400 focus:ring-2 focus:ring-[#ff8500] focus:ring-inset"
+                          />
+                        )}
+                        {!readOnly && (
+                          <div className="no-print absolute right-1 top-1 flex gap-1 opacity-0 transition group-hover:opacity-100">
+                            {onInsertPageBreakAbove && rowIndex >= 1 && rows.length > 1 && (
+                              <button type="button" onClick={() => onInsertPageBreakAbove(rowIndex)} className="flex h-6 w-6 items-center justify-center rounded-full bg-violet-100 text-xs text-violet-700 hover:bg-violet-200" title="Nouvelle page à partir de cette ligne">↵</button>
+                            )}
+                            <button type="button" onClick={() => addRowBelow(row.id)} className="flex h-6 w-6 items-center justify-center rounded-full bg-[#ff8500]/20 text-xs text-[#ff8500] hover:bg-[#ff8500]/30" title="Ajouter en dessous">+</button>
+                            <button type="button" onClick={() => deleteRow(row.id)} className="flex h-6 w-6 items-center justify-center rounded-full bg-red-100 text-xs text-red-600 hover:bg-red-200" title="Supprimer la ligne">×</button>
+                          </div>
+                        )}
+                      </td>
+                    )
+                  }
+                  const opt = key as ResponseOption
+                  return (
+                    <td key={key} className={`border border-black bg-white text-center align-middle ${cellPadding}`}>
                       <button
                         type="button"
-                        onClick={() => addRowBelow(row.id)}
-                        className="flex h-6 w-6 items-center justify-center rounded-full bg-[#ff8500]/20 text-xs text-[#ff8500] hover:bg-[#ff8500]/30"
-                        title="Ajouter en dessous"
+                        onClick={() => setResponse(row.id, opt)}
+                        disabled={readOnly}
+                        className="flex w-full items-center justify-center py-0.5 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#ff8500] disabled:pointer-events-none"
+                        title={tableColumns[opt]}
                       >
-                        +
+                        <div className={`flex shrink-0 items-center justify-center border-2 border-black bg-white font-bold ${compact ? 'h-5 w-5' : 'h-6 w-6'}`}>
+                          {row.response === opt ? <CheckedIcon /> : null}
+                        </div>
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => deleteRow(row.id)}
-                        className="flex h-6 w-6 items-center justify-center rounded-full bg-red-100 text-xs text-red-600 hover:bg-red-200"
-                        title="Supprimer la ligne"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  )}
-                </td>
+                    </td>
+                  )
+                })}
               </tr>
             )
           )}

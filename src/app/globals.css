@@ -43,15 +43,15 @@
     background: transparent !important;
     box-shadow: none !important;
   }
-  /* Table cell borders: thicker in print so they're visible at normal zoom in PDF */
+  /* Table cell borders: 1px in print for less bold look */
   table td,
   table th {
-    border: 3px solid #000 !important;
+    border: 1px solid #000 !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
   td.observation-cell {
-    border: 3px solid #000 !important;
+    border: 1px solid #000 !important;
   }
 
   /* Auto page break: don't split table rows; flow to next A4 page when one is full */
@@ -65,22 +65,12 @@
   }
 }
 
-/* Vertical lines between all columns (Exigences | Oui | Non | ... | Observation) - black */
+/* Vertical lines between all columns - 1px black for less bold look */
 table.audit-table td,
 table.audit-table th {
-  border: 2px solid #000 !important;
+  border: 1px solid #000 !important;
 }
 
-/* Observation cells: same bold borders on all sides (screen + print) */
 td.observation-cell {
-  border: 2px solid #000 !important;
-}
-@media print {
-  td.observation-cell {
-    border: 3px solid #000 !important;
-  }
-  table.audit-table td,
-  table.audit-table th {
-    border: 3px solid #000 !important;
-  }
+  border: 1px solid #000 !important;
 }
