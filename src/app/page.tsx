@@ -181,7 +181,7 @@ Section: 5. LEADERSHIP
   return (
     <div className="min-h-screen bg-slate-100 py-8 print:bg-white print:py-0">
       {/* Left navbar - blur/glass effect, French labels */}
-      <nav className="no-print fixed left-0 top-0 z-50 flex h-full w-48 flex-col gap-4 border-r border-white/20 bg-white/10 px-4 py-6 backdrop-blur-md">
+      <nav className="no-print fixed left-0 top-0 z-50 flex h-full w-52 flex-col gap-3 overflow-y-auto border-r border-white/20 bg-white/10 px-4 py-6 backdrop-blur-md">
         <div className="text-sm font-semibold text-slate-700">Couleurs</div>
         <label className="flex flex-col gap-1.5 text-sm text-slate-700">
           <span>En-tête</span>
@@ -258,15 +258,16 @@ Section: 5. LEADERSHIP
         <button
           type="button"
           onClick={handleImportListClick}
-          className="flex items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-2"
-          title="Importer un fichier .txt pour remplir le tableau (format : Section: titre, ou Titre | Question)"
+          className="flex items-center justify-center gap-1.5 rounded-xl bg-violet-600 px-3 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-2"
+          title="Choisir un fichier .txt pour remplir le tableau (format : Section: titre, ou Titre | Question)"
         >
-          Importer une liste
+          <span className="text-base leading-none" aria-hidden>📄</span>
+          Importer un fichier .txt
         </button>
         <button
           type="button"
           onClick={handleDownloadListTemplate}
-          className="text-[10px] text-violet-600 hover:underline"
+          className="text-[11px] text-violet-600 hover:underline"
         >
           Télécharger le modèle .txt
         </button>
