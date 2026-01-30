@@ -110,7 +110,7 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
             {RESPONSE_OPTIONS.map((key) => (
               <th
                 key={key}
-                className="w-[9%] border px-1 py-2 text-center text-[10px] font-semibold uppercase leading-tight tracking-wide text-white"
+                className={`border px-1 py-2 text-center text-[10px] font-semibold uppercase leading-tight tracking-wide text-white ${key === 'oui' || key === 'non' ? 'w-[6%]' : 'w-[11%]'}`}
                 style={headerStyle}
               >
                 {(key === 'nonConcerne' || key === 'affirmeParOperateur') ? (
@@ -238,7 +238,7 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                   </div>
                 </td>
                 {RESPONSE_OPTIONS.map((opt) => (
-                  <td key={opt} className="w-[9%] border border-slate-500 bg-white text-center align-middle">
+                  <td key={opt} className={`border border-slate-500 bg-white text-center align-middle ${opt === 'oui' || opt === 'non' ? 'w-[6%]' : 'w-[11%]'}`}>
                     <button
                       type="button"
                       onClick={() => setResponse(row.id, opt)}
