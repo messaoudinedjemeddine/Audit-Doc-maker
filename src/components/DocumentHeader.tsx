@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useRef } from 'react'
 import type { AuditPageData, DocMetaItem } from '@/types/audit'
 
 const HEADER_LINE_COLOR = '#ff8500'
@@ -55,6 +56,14 @@ export function DocumentHeader({
     })
   }
 
+  const companyNameRef = useRef<HTMLTextAreaElement>(null)
+  useEffect(() => {
+    const ta = companyNameRef.current
+    if (!ta) return
+    ta.style.height = 'auto'
+    ta.style.height = Math.max(ta.scrollHeight, 28) + 'px'
+  }, [data.companyName])
+
   return (
     <header
       className="mb-8 flex flex-wrap items-center justify-between gap-6 pb-6"
@@ -70,16 +79,17 @@ export function DocumentHeader({
           />
         </div>
 
-        <div>
+        <div className="min-w-0 max-w-[280px]">
           <h1 className="text-lg font-bold uppercase tracking-wide text-slate-900">
             {readOnly ? (
-              data.companyName
+              <span className="break-words">{data.companyName}</span>
             ) : (
-              <input
-                type="text"
+              <textarea
+                ref={companyNameRef}
                 value={data.companyName}
                 onChange={(e) => onChange({ companyName: e.target.value })}
-                className="w-full min-w-[200px] rounded border-0 bg-transparent font-bold uppercase tracking-wide text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-[#ff8500] focus:ring-inset"
+                rows={1}
+                className="w-full min-h-[1.5rem] resize-none overflow-hidden rounded border-0 bg-transparent font-bold uppercase tracking-wide text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-[#ff8500] focus:ring-inset"
                 placeholder="Nom de l'entreprise"
               />
             )}

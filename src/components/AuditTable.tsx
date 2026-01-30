@@ -1,11 +1,35 @@
 'use client'
 
+import { useEffect, useRef } from 'react'
 import type { AuditPageData, TableRow } from '@/types/audit'
 import type { ResponseOption } from '@/types/audit'
 import {
   createEmptyQuestionRow,
   createEmptySectionRow,
 } from '@/types/audit'
+
+function AutoResizeTextarea({
+  value,
+  onChange,
+  minHeight = 48,
+  ...props
+}: React.ComponentProps<'textarea'> & { minHeight?: number }) {
+  const ref = useRef<HTMLTextAreaElement>(null)
+  useEffect(() => {
+    const ta = ref.current
+    if (!ta) return
+    ta.style.height = 'auto'
+    ta.style.height = Math.max(ta.scrollHeight, minHeight) + 'px'
+  }, [value, minHeight])
+  return (
+    <textarea
+      ref={ref}
+      value={value}
+      onChange={onChange}
+      {...props}
+    />
+  )
+}
 
 interface AuditTableProps {
   data: AuditPageData
@@ -86,8 +110,8 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
   }
 
   return (
-    <div className="overflow-hidden border border-slate-500 bg-white shadow-sm">
-      <table className="w-full table-fixed border-collapse">
+    <div className="overflow-x-auto border border-slate-500 bg-white shadow-sm">
+      <table className="audit-table w-full table-fixed border-collapse">
         <thead>
           <tr style={headerStyle}>
             {/* Question column - smaller width */}
@@ -141,7 +165,7 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                 )}
               </th>
             ))}
-            <th className="w-[28%] border px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-white" style={headerStyle}>
+            <th className="w-[28%] border px-2 py-2 text-center text-xs font-semibold uppercase tracking-wide text-white align-middle" style={headerStyle}>
               {readOnly ? (
                 tableColumns.observation
               ) : (
@@ -153,7 +177,7 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                       tableColumns: { ...tableColumns, observation: e.target.value },
                     })
                   }
-                  className="w-full border-0 bg-transparent text-white placeholder:text-white/70 focus:ring-2 focus:ring-white focus:ring-inset"
+                  className="w-full border-0 bg-transparent text-center text-white placeholder:text-white/70 focus:ring-2 focus:ring-white focus:ring-inset"
                 />
               )}
             </th>
@@ -212,25 +236,27 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                   <div className="space-y-1">
                     {readOnly ? (
                       <>
-                        <div className="text-xs font-semibold text-slate-900">{row.title}</div>
-                        <div className="text-[11px] text-slate-600 leading-snug">{row.description}</div>
+                        <div className="text-xs font-semibold text-slate-900 break-words">{row.title}</div>
+                        <div className="text-[11px] text-slate-600 leading-snug break-words">{row.description}</div>
                       </>
                     ) : (
                       <>
-                        <input
-                          type="text"
+                        <AutoResizeTextarea
                           value={row.title}
                           onChange={(e) => updateQuestion(row.id, { title: e.target.value })}
-                          className="w-full border-0 bg-transparent text-xs font-semibold text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-[#ff8500] focus:ring-inset"
+                          minHeight={24}
+                          rows={1}
+                          className="w-full min-h-0 resize-none overflow-hidden border-0 bg-transparent text-xs font-semibold text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-[#ff8500] focus:ring-inset"
                           placeholder="Titre de l'élément"
                         />
-                        <textarea
+                        <AutoResizeTextarea
                           value={row.description}
                           onChange={(e) =>
                             updateQuestion(row.id, { description: e.target.value })
                           }
+                          minHeight={64}
                           rows={3}
-                          className="mt-1 w-full min-h-[4rem] resize-y border-0 bg-transparent text-[11px] text-slate-600 leading-snug placeholder:text-slate-400 focus:ring-2 focus:ring-[#ff8500] focus:ring-inset"
+                          className="mt-1 w-full min-h-[4rem] resize-none overflow-hidden border-0 bg-transparent text-[11px] text-slate-600 leading-snug placeholder:text-slate-400 focus:ring-2 focus:ring-[#ff8500] focus:ring-inset"
                           placeholder="Description (paragraphe)"
                         />
                       </>
@@ -254,20 +280,21 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                     </button>
                   </td>
                 ))}
-                <td className="observation-cell relative w-[28%] border border-slate-500 align-top px-2" style={questionRowStyle}>
+                <td className="observation-cell relative w-[28%] border border-slate-500 align-middle px-2" style={questionRowStyle}>
                   {readOnly ? (
                     row.observation ? (
-                      <div className="min-h-[2rem] whitespace-pre-wrap py-1 text-sm text-slate-700">{row.observation}</div>
+                      <div className="min-h-[2rem] whitespace-pre-wrap py-1 text-center text-sm text-slate-700">{row.observation}</div>
                     ) : (
-                      <DottedLines lines={3} />
+                      <div className="flex justify-center"><DottedLines lines={3} /></div>
                     )
                   ) : (
-                    <textarea
+                    <AutoResizeTextarea
                       value={row.observation}
                       onChange={(e) => updateQuestion(row.id, { observation: e.target.value })}
+                      minHeight={48}
                       placeholder="Saisir les observations..."
                       rows={3}
-                      className="min-h-[2rem] w-full resize-y border-0 bg-transparent py-1 text-sm text-slate-700 placeholder:text-slate-400 focus:ring-2 focus:ring-[#ff8500] focus:ring-inset"
+                      className="observation-textarea min-h-[2rem] w-full resize-none overflow-hidden border-0 bg-transparent py-1 text-center text-sm text-slate-700 placeholder:text-slate-400 focus:ring-2 focus:ring-[#ff8500] focus:ring-inset"
                     />
                   )}
                   {!readOnly && (
