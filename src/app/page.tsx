@@ -1,9 +1,10 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import type { AuditPageData } from '@/types/audit'
 import { defaultPageData } from '@/types/audit'
 import { AuditPage } from '@/components/AuditPage'
+import { exportDocument, importDocument } from '@/lib/audit-export'
 
 function createNewPage(): AuditPageData {
   return defaultPageData(crypto.randomUUID())
@@ -69,6 +70,44 @@ export default function Home() {
     window.print()
   }, [])
 
+  const handleExportDocument = useCallback(() => {
+    const json = exportDocument(pages)
+    const blob = new Blob([json], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `audit-document-${new Date().toISOString().slice(0, 10)}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }, [pages])
+
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const handleImportClick = useCallback(() => {
+    fileInputRef.current?.click()
+  }, [])
+
+  const handleImportFile = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      const text = reader.result as string
+      const imported = importDocument(text)
+      if (imported) {
+        setPages(imported)
+        if (typeof window !== 'undefined') {
+          window.alert('Document importé avec succès.')
+        }
+      } else {
+        if (typeof window !== 'undefined') {
+          window.alert('Fichier invalide. Utilisez un fichier .json exporté par cette application.')
+        }
+      }
+    }
+    reader.readAsText(file, 'UTF-8')
+    e.target.value = ''
+  }, [])
+
   return (
     <div className="min-h-screen bg-slate-100 py-8 print:bg-white print:py-0">
       {/* Left navbar - blur/glass effect, French labels */}
@@ -114,6 +153,30 @@ export default function Home() {
           />
         </label>
         <div className="my-2 border-t border-white/20" />
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".json,application/json"
+          className="hidden"
+          aria-hidden
+          onChange={handleImportFile}
+        />
+        <button
+          type="button"
+          onClick={handleExportDocument}
+          className="flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2"
+          title="Télécharge un fichier .json pour rouvrir plus tard"
+        >
+          Enregistrer le document
+        </button>
+        <button
+          type="button"
+          onClick={handleImportClick}
+          className="flex items-center justify-center gap-2 rounded-xl bg-indigo-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2"
+          title="Ouvrir un fichier .json précédemment exporté"
+        >
+          Importer un document
+        </button>
         <button
           type="button"
           onClick={addPage}
