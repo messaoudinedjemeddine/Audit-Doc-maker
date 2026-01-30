@@ -43,15 +43,15 @@
     background: transparent !important;
     box-shadow: none !important;
   }
-  /* Table cell borders: 1px in print for less bold look */
-  table td,
-  table th {
-    border: 1px solid #000 !important;
+  /* Table borders in print: 1.5px so row/column lines stay visible at normal PDF zoom (1px often disappears) */
+  table.audit-table td,
+  table.audit-table th {
+    border: 1.5px solid #000 !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
   td.observation-cell {
-    border: 1px solid #000 !important;
+    border: 1.5px solid #000 !important;
   }
 
   /* Auto page break: don't split table rows; flow to next A4 page when one is full */
