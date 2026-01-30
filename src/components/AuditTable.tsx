@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { AuditPageData, TableRow } from '@/types/audit'
 import type { ResponseOption } from '@/types/audit'
 import {
@@ -72,13 +72,81 @@ function DottedLines({ lines = 3 }: { lines?: number }) {
 
 const RESPONSE_OPTIONS: ResponseOption[] = ['oui', 'non', 'nonConcerne', 'observe', 'affirmeParOperateur']
 
+const COL_KEYS = ['exigences', ...RESPONSE_OPTIONS, 'observation'] as const
+
+const DEFAULT_WIDTHS = {
+  exigences: 28,
+  oui: 6,
+  non: 6,
+  nonConcerne: 11,
+  observe: 11,
+  affirmeParOperateur: 11,
+  observation: 27,
+}
+
+const MIN_COL_WIDTH_PCT = 3
+
 export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
-  const { rows, tableColumns, headerColor, sectionHeaderColor, questionRowColor } = data
+  const { rows, tableColumns, tableColumnWidths, headerColor, sectionHeaderColor, questionRowColor } = data
+  const widths = tableColumnWidths ?? DEFAULT_WIDTHS
   const headerStyle = { backgroundColor: headerColor, borderColor: headerColor }
   const sectionStyle = { backgroundColor: sectionHeaderColor }
   const questionRowStyle = { backgroundColor: questionRowColor }
 
+  const tableRef = useRef<HTMLTableElement>(null)
+  const [resizingAfter, setResizingAfter] = useState<number | null>(null)
+  const resizeStartX = useRef(0)
+  const resizeStartWidths = useRef({ ...DEFAULT_WIDTHS })
+
   const setRows = (newRows: TableRow[]) => onChange({ rows: newRows })
+
+  const handleResizeStart = useCallback((colIndex: number, clientX: number) => {
+    if (readOnly) return
+    setResizingAfter(colIndex)
+    resizeStartX.current = clientX
+    resizeStartWidths.current = { ...widths }
+  }, [readOnly, widths])
+
+  useEffect(() => {
+    if (resizingAfter === null) return
+    const table = tableRef.current
+    if (!table) return
+
+    const onMove = (e: MouseEvent) => {
+      const tableWidth = table.offsetWidth
+      if (tableWidth <= 0) return
+      const deltaPct = ((e.clientX - resizeStartX.current) / tableWidth) * 100
+      const prev = resizeStartWidths.current
+      const keys = COL_KEYS
+      const leftKey = keys[resizingAfter]
+      const rightKey = keys[resizingAfter + 1]
+      let newLeft = prev[leftKey] + deltaPct
+      let newRight = prev[rightKey] - deltaPct
+      if (newLeft < MIN_COL_WIDTH_PCT) {
+        newLeft = MIN_COL_WIDTH_PCT
+        newRight = prev[leftKey] + prev[rightKey] - MIN_COL_WIDTH_PCT
+      }
+      if (newRight < MIN_COL_WIDTH_PCT) {
+        newRight = MIN_COL_WIDTH_PCT
+        newLeft = prev[leftKey] + prev[rightKey] - MIN_COL_WIDTH_PCT
+      }
+      const next = { ...widths, [leftKey]: newLeft, [rightKey]: newRight }
+      onChange({ tableColumnWidths: next })
+    }
+
+    const onUp = () => setResizingAfter(null)
+
+    document.addEventListener('mousemove', onMove)
+    document.addEventListener('mouseup', onUp)
+    document.body.style.cursor = 'col-resize'
+    document.body.style.userSelect = 'none'
+    return () => {
+      document.removeEventListener('mousemove', onMove)
+      document.removeEventListener('mouseup', onUp)
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+  }, [resizingAfter, onChange, widths])
 
   const addSection = () => setRows([...rows, createEmptySectionRow()])
   const addQuestionAtEnd = () => setRows([...rows, createEmptyQuestionRow()])
@@ -111,11 +179,15 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
 
   return (
     <div className="overflow-x-auto border border-slate-500 bg-white shadow-sm">
-      <table className="audit-table w-full table-fixed border-collapse">
+      <table ref={tableRef} className="audit-table w-full table-fixed border-collapse">
+        <colgroup>
+          {COL_KEYS.map((key, i) => (
+            <col key={key} style={{ width: `${widths[key]}%` }} />
+          ))}
+        </colgroup>
         <thead>
           <tr style={headerStyle}>
-            {/* Question column - smaller width */}
-            <th className="w-[28%] border px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-white" style={headerStyle}>
+            <th className="relative border px-2 py-2 text-left text-xs font-semibold uppercase tracking-wide text-white" style={headerStyle}>
               {readOnly ? (
                 tableColumns.exigences
               ) : (
@@ -130,11 +202,19 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                   className="w-full border-0 bg-transparent text-white placeholder:text-white/70 focus:ring-2 focus:ring-white focus:ring-inset"
                 />
               )}
+              {!readOnly && (
+                <div
+                  className="no-print absolute right-0 top-0 z-10 h-full w-1.5 cursor-col-resize hover:bg-white/30"
+                  title="Glisser pour redimensionner"
+                  onMouseDown={(e) => handleResizeStart(0, e.clientX)}
+                  aria-hidden
+                />
+              )}
             </th>
-            {RESPONSE_OPTIONS.map((key) => (
+            {RESPONSE_OPTIONS.map((key, i) => (
               <th
                 key={key}
-                className={`border px-1 py-2 text-center text-[10px] font-semibold uppercase leading-tight tracking-wide text-white ${key === 'oui' || key === 'non' ? 'w-[6%]' : 'w-[11%]'}`}
+                className="relative border px-1 py-2 text-center text-[10px] font-semibold uppercase leading-tight tracking-wide text-white"
                 style={headerStyle}
               >
                 {(key === 'nonConcerne' || key === 'affirmeParOperateur') ? (
@@ -163,9 +243,17 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                     className="w-full border-0 bg-transparent text-center text-white placeholder:text-white/70 focus:ring-2 focus:ring-white focus:ring-inset"
                   />
                 )}
+                {!readOnly && (
+                  <div
+                    className="no-print absolute right-0 top-0 z-10 h-full w-1.5 cursor-col-resize hover:bg-white/30"
+                    title="Glisser pour redimensionner"
+                    onMouseDown={(e) => handleResizeStart(i + 1, e.clientX)}
+                    aria-hidden
+                  />
+                )}
               </th>
             ))}
-            <th className="w-[28%] border px-2 py-2 text-center text-xs font-semibold uppercase tracking-wide text-white align-middle" style={headerStyle}>
+            <th className="border px-2 py-2 text-center text-xs font-semibold uppercase tracking-wide text-white align-middle" style={headerStyle}>
               {readOnly ? (
                 tableColumns.observation
               ) : (
@@ -232,7 +320,7 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                 key={row.id}
                 className="group border-b border-slate-500 transition hover:bg-slate-50/50"
               >
-                <td className="w-[28%] border border-slate-500 px-2 py-2 align-top" style={questionRowStyle}>
+                <td className="border border-slate-500 px-2 py-2 align-top" style={questionRowStyle}>
                   <div className="space-y-1">
                     {readOnly ? (
                       <>
@@ -264,7 +352,7 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                   </div>
                 </td>
                 {RESPONSE_OPTIONS.map((opt) => (
-                  <td key={opt} className={`border border-slate-500 bg-white text-center align-middle ${opt === 'oui' || opt === 'non' ? 'w-[6%]' : 'w-[11%]'}`}>
+                  <td key={opt} className="border border-slate-500 bg-white text-center align-middle">
                     <button
                       type="button"
                       onClick={() => setResponse(row.id, opt)}
@@ -280,7 +368,7 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                     </button>
                   </td>
                 ))}
-                <td className="observation-cell relative w-[28%] border border-slate-500 align-middle px-2" style={questionRowStyle}>
+                <td className="observation-cell relative border border-slate-500 align-middle px-2" style={questionRowStyle}>
                   {readOnly ? (
                     row.observation ? (
                       <div className="min-h-[2rem] whitespace-pre-wrap py-1 text-center text-sm text-slate-700">{row.observation}</div>

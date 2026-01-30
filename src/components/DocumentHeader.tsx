@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
 import type { AuditPageData, DocMetaItem } from '@/types/audit'
 
 const HEADER_LINE_COLOR = '#ff8500'
@@ -56,14 +55,6 @@ export function DocumentHeader({
     })
   }
 
-  const companyNameRef = useRef<HTMLTextAreaElement>(null)
-  useEffect(() => {
-    const ta = companyNameRef.current
-    if (!ta) return
-    ta.style.height = 'auto'
-    ta.style.height = Math.max(ta.scrollHeight, 28) + 'px'
-  }, [data.companyName])
-
   return (
     <header
       className="mb-8 flex flex-wrap items-center justify-between gap-6 pb-6"
@@ -79,17 +70,16 @@ export function DocumentHeader({
           />
         </div>
 
-        <div className="min-w-0 max-w-[280px]">
+        <div>
           <h1 className="text-lg font-bold uppercase tracking-wide text-slate-900">
             {readOnly ? (
-              <span className="break-words">{data.companyName}</span>
+              data.companyName
             ) : (
-              <textarea
-                ref={companyNameRef}
+              <input
+                type="text"
                 value={data.companyName}
                 onChange={(e) => onChange({ companyName: e.target.value })}
-                rows={1}
-                className="w-full min-h-[1.5rem] resize-none overflow-hidden rounded border-0 bg-transparent font-bold uppercase tracking-wide text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-[#ff8500] focus:ring-inset"
+                className="w-full min-w-[200px] rounded border-0 bg-transparent font-bold uppercase tracking-wide text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-[#ff8500] focus:ring-inset"
                 placeholder="Nom de l'entreprise"
               />
             )}
@@ -103,14 +93,14 @@ export function DocumentHeader({
                 value={data.companySubtitle}
                 onChange={(e) => onChange({ companySubtitle: e.target.value })}
                 className="w-full min-w-[200px] rounded border-0 bg-transparent text-sm text-slate-600 placeholder:text-slate-400 focus:ring-2 focus:ring-[#ff8500] focus:ring-inset"
-                placeholder="Sous-titre"
+                placeholder="Filiale de PT. ..."
               />
             )}
           </h2>
         </div>
       </div>
 
-      <div className="text-right">
+      <div className="text-center">
         <div className="text-xl font-extrabold text-slate-900">
           {readOnly ? (
             data.docTitle
@@ -119,7 +109,7 @@ export function DocumentHeader({
               type="text"
               value={data.docTitle}
               onChange={(e) => onChange({ docTitle: e.target.value })}
-              className="w-full min-w-[140px] rounded border-0 bg-transparent text-right text-xl font-extrabold text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-[#ff8500] focus:ring-inset"
+              className="w-full min-w-[140px] rounded border-0 bg-transparent text-center text-xl font-extrabold text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-[#ff8500] focus:ring-inset"
               placeholder="AUDIT INTERNE"
             />
           )}

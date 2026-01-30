@@ -36,6 +36,7 @@ export default function Home() {
       sectionHeaderColor: first.sectionHeaderColor,
       questionRowColor: first.questionRowColor,
       tableColumns: { ...first.tableColumns },
+      tableColumnWidths: { ...first.tableColumnWidths },
       rows: [
         {
           type: 'question',

@@ -36,6 +36,16 @@ export interface AuditPageData {
     affirmeParOperateur: string;
     observation: string;
   };
+  /** Column widths as percentage (0–100), must sum to 100. Used for resizable columns. */
+  tableColumnWidths: {
+    exigences: number;
+    oui: number;
+    non: number;
+    nonConcerne: number;
+    observe: number;
+    affirmeParOperateur: number;
+    observation: number;
+  };
   rows: TableRow[];
 }
 
@@ -79,6 +89,15 @@ export const defaultPageData = (id: string): AuditPageData => ({
     observe: 'Observe',
     affirmeParOperateur: "Affirmé par\nl'opérateur",
     observation: 'Observation',
+  },
+  tableColumnWidths: {
+    exigences: 28,
+    oui: 6,
+    non: 6,
+    nonConcerne: 11,
+    observe: 11,
+    affirmeParOperateur: 11,
+    observation: 27,
   },
   rows: [
     {
