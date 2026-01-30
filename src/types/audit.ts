@@ -1,12 +1,13 @@
-export type TableRow = 
+export type ResponseOption = 'oui' | 'non' | 'nonConcerne' | 'observe' | 'affirmeParOperateur'
+
+export type TableRow =
   | { type: 'section'; id: string; title: string }
   | {
       type: 'question';
       id: string;
       title: string;
       description: string;
-      yes: boolean;
-      no: boolean;
+      response: ResponseOption | null;
       observation: string;
     };
 
@@ -26,72 +27,80 @@ export interface AuditPageData {
   headerColor: string;
   sectionHeaderColor: string;
   questionRowColor: string;
-  tableColumns: { exigences: string; yes: string; no: string; observation: string };
+  tableColumns: {
+    exigences: string;
+    oui: string;
+    non: string;
+    nonConcerne: string;
+    observe: string;
+    affirmeParOperateur: string;
+    observation: string;
+  };
   rows: TableRow[];
 }
 
 export const defaultDocMeta = (): DocMetaItem[] => [
-  { id: crypto.randomUUID(), label: 'Doc No', value: 'FR/ADC-PM-02/03' },
-  { id: crypto.randomUUID(), label: 'Rev', value: '00' },
-  { id: crypto.randomUUID(), label: 'Date', value: '03 April 2023' },
-  { id: crypto.randomUUID(), label: 'Standard', value: 'ISO 14001:2015' },
+  { id: crypto.randomUUID(), label: 'N° Doc', value: 'FR/ADC-PM-02/03' },
+  { id: crypto.randomUUID(), label: 'Révision', value: '00' },
+  { id: crypto.randomUUID(), label: 'Date', value: '03 avril 2023' },
+  { id: crypto.randomUUID(), label: 'Norme', value: 'ISO 14001:2015' },
 ]
 
 export const createEmptyQuestionRow = (): Extract<TableRow, { type: 'question' }> => ({
   type: 'question',
   id: crypto.randomUUID(),
-  title: 'New Item Title',
-  description: 'Description or question goes here...',
-  yes: false,
-  no: false,
+  title: 'Nouveau titre',
+  description: 'Description ou question...',
+  response: null,
   observation: '',
 });
 
 export const createEmptySectionRow = (): Extract<TableRow, { type: 'section' }> => ({
   type: 'section',
   id: crypto.randomUUID(),
-  title: 'NEW SECTION TITLE',
+  title: 'NOUVEAU TITRE DE SECTION',
 });
 
 export const defaultPageData = (id: string): AuditPageData => ({
   id,
   companyName: 'PT. ARTHA DAYA COALINDO',
-  companySubtitle: 'Subsidiary of PT. INDONESIA POWER',
-  docTitle: 'INTERNAL AUDIT',
+  companySubtitle: 'Filiale de PT. INDONESIA POWER',
+  docTitle: 'AUDIT INTERNE',
   docMeta: defaultDocMeta(),
   logoDataUrl: null,
-  headerColor: '#0284c7',
+  headerColor: '#ff8500',
   sectionHeaderColor: '#e2e8f0',
   questionRowColor: '#f8fafc',
   tableColumns: {
     exigences: 'Exigences',
-    yes: 'Yes',
-    no: 'No',
+    oui: 'Oui',
+    non: 'Non',
+    nonConcerne: 'Non concerné',
+    observe: 'Observe',
+    affirmeParOperateur: "Affirmé par l'opérateur",
     observation: 'Observation',
   },
   rows: [
     {
       type: 'section',
       id: crypto.randomUUID(),
-      title: '4. CONTEXT OF THE ORGANIZATION',
+      title: '4. CONTEXTE DE L\'ORGANISATION',
     },
     {
       type: 'question',
       id: crypto.randomUUID(),
-      title: '4.1 Understanding the organization',
+      title: '4.1 Compréhension de l\'organisation',
       description:
-        'Has the organization determined external and internal issues relevant to its purpose?',
-      yes: false,
-      no: false,
+        "L'organisation a-t-elle déterminé les enjeux externes et internes pertinents pour son objectif ?",
+      response: null,
       observation: '',
     },
     {
       type: 'question',
       id: crypto.randomUUID(),
-      title: '4.2 Interested Parties',
-      description: 'Have requirements of interested parties been identified?',
-      yes: false,
-      no: false,
+      title: '4.2 Parties intéressées',
+      description: 'Les exigences des parties intéressées ont-elles été identifiées ?',
+      response: null,
       observation: '',
     },
   ],

@@ -40,10 +40,9 @@ export default function Home() {
         {
           type: 'question',
           id: crypto.randomUUID(),
-          title: 'New Item Title',
-          description: 'Description or question goes here...',
-          yes: false,
-          no: false,
+          title: 'Nouveau titre',
+          description: 'Description ou question...',
+          response: null,
           observation: '',
         },
       ],
@@ -57,7 +56,7 @@ export default function Home() {
   }, [pages])
 
   const removePage = useCallback((pageId: string) => {
-    if (typeof window !== 'undefined' && !window.confirm('Remove this entire page?')) return
+    if (typeof window !== 'undefined' && !window.confirm('Supprimer cette page entière ?')) return
     setPages((prev) => prev.filter((p) => p.id !== pageId))
   }, [])
 
@@ -71,23 +70,24 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-slate-100 py-8 print:bg-white print:py-0">
-      {/* Toolbar - hidden when printing */}
-      <div className="no-print fixed right-6 top-6 z-50 flex flex-wrap items-center gap-3">
-        <label className="flex items-center gap-2 text-sm text-slate-700">
-          <span>Header:</span>
+      {/* Left navbar - blur/glass effect, French labels */}
+      <nav className="no-print fixed left-0 top-0 z-50 flex h-full w-48 flex-col gap-4 border-r border-white/20 bg-white/10 px-4 py-6 backdrop-blur-md">
+        <div className="text-sm font-semibold text-slate-700">Couleurs</div>
+        <label className="flex flex-col gap-1.5 text-sm text-slate-700">
+          <span>En-tête</span>
           <input
             type="color"
-            value={pages[0]?.headerColor ?? '#0284c7'}
+            value={pages[0]?.headerColor ?? '#ff8500'}
             onChange={(e) => {
               const color = e.target.value
               setPages((prev) => prev.map((p) => ({ ...p, headerColor: color })))
             }}
-            className="h-9 w-14 cursor-pointer rounded border border-slate-300"
-            title="Table header color"
+            className="h-9 w-full cursor-pointer rounded border border-slate-300 bg-white/50"
+            title="Couleur de l'en-tête du tableau"
           />
         </label>
-        <label className="flex items-center gap-2 text-sm text-slate-700">
-          <span>Section titles:</span>
+        <label className="flex flex-col gap-1.5 text-sm text-slate-700">
+          <span>Titres de section</span>
           <input
             type="color"
             value={pages[0]?.sectionHeaderColor ?? '#e2e8f0'}
@@ -95,12 +95,12 @@ export default function Home() {
               const color = e.target.value
               setPages((prev) => prev.map((p) => ({ ...p, sectionHeaderColor: color })))
             }}
-            className="h-9 w-14 cursor-pointer rounded border border-slate-300"
-            title="Section title rows color"
+            className="h-9 w-full cursor-pointer rounded border border-slate-300 bg-white/50"
+            title="Couleur des titres de section"
           />
         </label>
-        <label className="flex items-center gap-2 text-sm text-slate-700">
-          <span>Item rows:</span>
+        <label className="flex flex-col gap-1.5 text-sm text-slate-700">
+          <span>Lignes d'éléments</span>
           <input
             type="color"
             value={pages[0]?.questionRowColor ?? '#f8fafc'}
@@ -108,37 +108,38 @@ export default function Home() {
               const color = e.target.value
               setPages((prev) => prev.map((p) => ({ ...p, questionRowColor: color })))
             }}
-            className="h-9 w-14 cursor-pointer rounded border border-slate-300"
-            title="Question row (title item) color"
+            className="h-9 w-full cursor-pointer rounded border border-slate-300 bg-white/50"
+            title="Couleur des lignes de question"
           />
         </label>
+        <div className="my-2 border-t border-white/20" />
         <button
           type="button"
           onClick={addPage}
-          className="flex items-center gap-2 rounded-xl bg-sky-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2"
+          className="flex items-center justify-center gap-2 rounded-xl bg-[#ff8500] px-4 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:bg-[#e67600] focus:outline-none focus:ring-2 focus:ring-[#ff8500] focus:ring-offset-2"
         >
           <span className="text-lg leading-none">+</span>
-          Add page
+          Ajouter une page
         </button>
         <button
           type="button"
           onClick={handleSavePdf}
-          className="flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2"
-          title="Opens print dialog — choose &quot;Save as PDF&quot; or &quot;Microsoft Print to PDF&quot; as destination"
+          className="flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2"
+          title="Ouvre la boîte d'impression — choisir « Enregistrer au format PDF » comme destination"
         >
-          Save as PDF
+          Enregistrer en PDF
         </button>
         <button
           type="button"
           onClick={handlePrint}
-          className="flex items-center gap-2 rounded-xl bg-slate-800 px-4 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2"
+          className="flex items-center justify-center gap-2 rounded-xl bg-slate-800 px-4 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2"
         >
-          Print
+          Imprimer
         </button>
-      </div>
+      </nav>
 
-      {/* Document area - used for PDF export */}
-      <div id="document-area" className="mx-auto flex max-w-[230mm] flex-col gap-8 px-4 print:max-w-none print:gap-0 print:px-0">
+      {/* Document area - offset for left navbar */}
+      <div id="document-area" className="mx-auto flex max-w-[230mm] flex-col gap-8 px-4 pl-56 print:max-w-none print:gap-0 print:px-0 print:pl-0">
         {pages.map((page, index) => (
           <div key={page.id} id={`page-${page.id}`}>
             <AuditPage
