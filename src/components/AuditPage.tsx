@@ -8,6 +8,7 @@ interface AuditPageProps {
   data: AuditPageData
   onChange: (updates: Partial<AuditPageData>) => void
   onRemove?: () => void
+  onInsertPageBreakAbove?: (rowIndex: number) => void
   isFirstPage: boolean
   pageIndex: number
   totalPages: number
@@ -18,6 +19,7 @@ export function AuditPage({
   data,
   onChange,
   onRemove,
+  onInsertPageBreakAbove,
   isFirstPage,
   pageIndex,
   totalPages,
@@ -32,7 +34,12 @@ export function AuditPage({
         totalPages={totalPages}
         readOnly={readOnly}
       />
-      <AuditTable data={data} onChange={onChange} readOnly={readOnly} />
+      <AuditTable
+        data={data}
+        onChange={onChange}
+        readOnly={readOnly}
+        onInsertPageBreakAbove={onInsertPageBreakAbove}
+      />
 
       {!readOnly && !isFirstPage && onRemove && (
         <div className="no-print mt-6 flex justify-center">

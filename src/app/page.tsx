@@ -65,6 +65,36 @@ export default function Home() {
     setPages((prev) => prev.filter((p) => p.id !== pageId))
   }, [])
 
+  const insertPageBreak = useCallback((pageId: string, rowIndex: number) => {
+    setPages((prev) => {
+      const pageIndex = prev.findIndex((p) => p.id === pageId)
+      if (pageIndex === -1 || rowIndex <= 0 || rowIndex >= prev[pageIndex].rows.length) return prev
+      const page = prev[pageIndex]
+      const headRows = page.rows.slice(0, rowIndex)
+      const tailRows = page.rows.slice(rowIndex)
+      const newPage: AuditPageData = {
+        ...page,
+        id: crypto.randomUUID(),
+        companyName: page.companyName,
+        companySubtitle: page.companySubtitle,
+        docTitle: page.docTitle,
+        docMeta: page.docMeta.map((item) => ({ ...item, id: crypto.randomUUID(), value: item.value })),
+        logoDataUrl: page.logoDataUrl,
+        headerColor: page.headerColor,
+        sectionHeaderColor: page.sectionHeaderColor,
+        questionRowColor: page.questionRowColor,
+        tableColumns: { ...page.tableColumns },
+        tableColumnWidths: { ...page.tableColumnWidths },
+        rows: tailRows,
+      }
+      const updatedPage = { ...page, rows: headRows }
+      const next = [...prev]
+      next[pageIndex] = updatedPage
+      next.splice(pageIndex + 1, 0, newPage)
+      return next
+    })
+  }, [])
+
   const handlePrint = useCallback(() => {
     window.print()
   }, [])
@@ -364,6 +394,7 @@ Section: 5. LEADERSHIP
               data={page}
               onChange={(updates) => updatePage(page.id, updates)}
               onRemove={pages.length > 1 ? () => removePage(page.id) : undefined}
+              onInsertPageBreakAbove={(rowIndex) => insertPageBreak(page.id, rowIndex)}
               isFirstPage={index === 0}
               pageIndex={index}
               totalPages={pages.length}

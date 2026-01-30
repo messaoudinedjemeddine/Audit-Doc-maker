@@ -35,6 +35,7 @@ interface AuditTableProps {
   data: AuditPageData
   onChange: (updates: Partial<AuditPageData>) => void
   readOnly?: boolean
+  onInsertPageBreakAbove?: (rowIndex: number) => void
 }
 
 function updateRow(rows: TableRow[], id: string, updates: Partial<TableRow>): TableRow[] {
@@ -86,7 +87,7 @@ const DEFAULT_WIDTHS = {
 
 const MIN_COL_WIDTH_PCT = 3
 
-export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
+export function AuditTable({ data, onChange, readOnly, onInsertPageBreakAbove }: AuditTableProps) {
   const { rows, tableColumns, tableColumnWidths, headerColor, sectionHeaderColor, questionRowColor } = data
   const widths = tableColumnWidths ?? DEFAULT_WIDTHS
   const headerStyle = { backgroundColor: headerColor, borderColor: headerColor }
@@ -272,7 +273,7 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
           </tr>
         </thead>
         <tbody>
-          {rows.map((row) =>
+          {rows.map((row, rowIndex) =>
             row.type === 'section' ? (
               <tr key={row.id} className="group border-b border-black">
                 <td
@@ -294,6 +295,16 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                     )}
                     {!readOnly && (
                       <div className="no-print flex shrink-0 gap-1 opacity-0 transition group-hover:opacity-100">
+                        {onInsertPageBreakAbove && rowIndex >= 1 && rows.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => onInsertPageBreakAbove(rowIndex)}
+                            className="flex h-7 w-7 items-center justify-center rounded-full bg-violet-100 text-violet-700 hover:bg-violet-200"
+                            title="Nouvelle page à partir de cette ligne"
+                          >
+                            ↵
+                          </button>
+                        )}
                         <button
                           type="button"
                           onClick={() => addRowBelow(row.id)}
@@ -387,6 +398,16 @@ export function AuditTable({ data, onChange, readOnly }: AuditTableProps) {
                   )}
                   {!readOnly && (
                     <div className="no-print absolute right-1 top-1 flex gap-1 opacity-0 transition group-hover:opacity-100">
+                      {onInsertPageBreakAbove && rowIndex >= 1 && rows.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => onInsertPageBreakAbove(rowIndex)}
+                          className="flex h-6 w-6 items-center justify-center rounded-full bg-violet-100 text-xs text-violet-700 hover:bg-violet-200"
+                          title="Nouvelle page à partir de cette ligne"
+                        >
+                          ↵
+                        </button>
+                      )}
                       <button
                         type="button"
                         onClick={() => addRowBelow(row.id)}
